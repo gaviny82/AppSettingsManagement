@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "AppSettingsManagementSample (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "AppSettingsManagementSample (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
