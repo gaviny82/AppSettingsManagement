@@ -7,9 +7,16 @@ using System.Threading.Tasks;
 namespace AppSettingsManagement;
 
 
-public interface ISettingsManager
+public interface ISettingsContainer
 {
-    event SettingChangedEventHandler SettingsChanged;
+    /// <summary>
+    /// Name and Parent are null when the container is the root container.
+    /// </summary>
+    ISettingsContainer? Parent { get; init; }
+
+    string Name { get; init; }
+
+    event SettingChangedEventHandler? SettingsChanged;
 
     ISettingsStorage Storage { get; }
 }

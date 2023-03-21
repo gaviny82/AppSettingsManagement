@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using AppSettingsManagementSample.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -31,11 +32,23 @@ namespace AppSettingsManagementSample
     {
         public string TestString { get; set; }
 
+        public SettingsManagerService SettingsManager { get; } = new();
+        ApplicationDataContainer LocalSettings = ApplicationData.Current.LocalSettings;
+
+        void ResetSettings()
+        {
+            LocalSettings.Values.Clear();
+            foreach (var c in LocalSettings.Containers.Keys)
+                LocalSettings.DeleteContainer(c);
+        }
+
         public MainWindow()
         {
             this.InitializeComponent();
 
-            var localSettings = ApplicationData.Current.LocalSettings;
+            //ResetSettings();
+            
+
             // Cannot be used in unpackaged mode
 
             // Test: Create child containers
@@ -43,11 +56,11 @@ namespace AppSettingsManagementSample
             //accountsContainer.Values["Username"] = "USERNAME";
 
             // Test: Storing arrays
-            int[] ints = { 1, 2, 3 };
-            localSettings.Values["ExampleArray"] = ints;
+            //int[] ints = { 1, 2, 3 };
+            //localSettings.Values["ExampleArray"] = ints;
 
-            string[] strs = { "str1", "str2" };
-            localSettings.Values["StrArray"] = strs;
+            //string[] strs = { "str1", "str2" };
+            //localSettings.Values["StrArray"] = strs;
 
             //Array a;
         }

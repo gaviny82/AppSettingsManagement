@@ -4,19 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AppSettingsManagement
+namespace AppSettingsManagement;
+
+public class SettingChangedEventArgs
 {
-    public class SettingChangedEventArgs
+    public string Key { get; init; }
+    public object? NewValue { get; init; }
+
+    public SettingChangedEventArgs(string key, object? value)
     {
-        public string Key { get; init; }
-        public object? NewValue { get; init; }
-
-        public SettingChangedEventArgs(string key, object? value)
-        {
-            Key = key;
-            NewValue = value;
-        }
+        Key = key;
+        NewValue = value;
     }
-
-    public delegate void SettingChangedEventHandler(ISettingsManager sender, SettingChangedEventArgs e);
 }
+
+public delegate void SettingChangedEventHandler(SettingsContainer sender, SettingChangedEventArgs e);

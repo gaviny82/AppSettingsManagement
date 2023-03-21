@@ -48,4 +48,18 @@ namespace AppSettingsManagement
         }
 
     }
+
+    /// <summary>
+    /// Indicate that the property is used as a settings container.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class SettingsContainerAttribute : Attribute
+    {
+        public string ContainerName { get; set; }
+
+        public SettingsContainerAttribute(string name)
+        {
+            ContainerName = name;
+        }
+    }
 }
