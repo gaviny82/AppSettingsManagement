@@ -13,8 +13,11 @@
     <StackPanel
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
-        Orientation="Horizontal">
-        <Button x:Name="myButton" Click="myButton_Click">Click Me</Button>
-        <TextBlock Text="{x:Bind TestString}" />
+        Orientation="Vertical"
+        Spacing="4">
+
+        <Button Click="setNumber_Click">Set Number</Button>
+        <Button Click="setString_Click">Set String</Button>
+
     </StackPanel>
 </Window>

@@ -54,7 +54,7 @@ namespace AppSettingsManagementSample
             Host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddSingleton<SettingsManagerService>();
+                    services.AddSingleton<SettingsService>();
                 })
                 .Build();
         }

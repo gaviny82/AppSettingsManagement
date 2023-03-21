@@ -32,7 +32,7 @@ namespace AppSettingsManagementSample
     {
         public string TestString { get; set; }
 
-        public SettingsManagerService SettingsManager { get; } = new();
+        public SettingsService SettingsManager { get; } = new();
         ApplicationDataContainer LocalSettings = ApplicationData.Current.LocalSettings;
 
         void ResetSettings()
@@ -46,9 +46,9 @@ namespace AppSettingsManagementSample
         {
             this.InitializeComponent();
 
-            //ResetSettings();
-            
-
+            ResetSettings();
+            var num = SettingsManager.Number;
+            var a = 1;
             // Cannot be used in unpackaged mode
 
             // Test: Create child containers
@@ -65,10 +65,15 @@ namespace AppSettingsManagementSample
             //Array a;
         }
 
-        private void myButton_Click(object sender, RoutedEventArgs e)
+        private void setNumber_Click(object sender, RoutedEventArgs e)
         {
-            myButton.Content = "Clicked";
-            ApplicationData.Current.LocalSettings.Values["TestString"] = (int)Theme.Dark;
+            var n = SettingsManager.Number;
+            SettingsManager.Number = 3123;
+        }
+
+        private void setString_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsManager.Username = "Name 1";
         }
     }
 

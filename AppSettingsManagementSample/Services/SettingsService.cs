@@ -8,10 +8,15 @@ using System.Threading.Tasks;
 
 namespace AppSettingsManagementSample.Services;
 
-public class SettingsManagerService : SettingsContainer
+public partial class SettingsService
+{
+
+}
+
+public partial class SettingsService : SettingsContainer
 {
     static ISettingsStorage Provider = new WindowsSettingsStorage();
-    public SettingsManagerService() : base(Provider) 
+    public SettingsService() : base(Provider) 
     {
         // Autogenerate:
         ActiveAccount = new(Provider, nameof(ActiveAccount), this);
@@ -22,7 +27,7 @@ public class SettingsManagerService : SettingsContainer
     [SettingItem(nameof(Username))]
     public string? Username // Autogenerate:
     {
-        get => GetValue<string>(nameof(Username));
+        get => GetValueReferenceType<string>(nameof(Username));
         set => SetValue<string>(nameof(Username), value, ref UsernameChanged);
     }
 
@@ -105,17 +110,17 @@ public class AccountContainer : SettingsContainer
     public AccountContainer(ISettingsStorage storage, string name, ISettingsContainer parent) : base(storage, name, parent) { }
 
     [SettingItem(nameof(Username))]
-    public string Username
+    public string? Username
     {
-        get => GetValue<string>(nameof(Username));
+        get => GetValueReferenceType<string>(nameof(Username));
         set => SetValue<string>(nameof(Username), value, ref UsernameChanged);
     }
     public event SettingChangedEventHandler? UsernameChanged;
 
     [SettingItem(nameof(Password))]
-    public string Password
+    public string? Password
     {
-        get => GetValue<string>(nameof(Password));
+        get => GetValueReferenceType<string>(nameof(Password));
         set => SetValue<string>(nameof(Password), value, ref PasswordChanged);
     }
     public event SettingChangedEventHandler? PasswordChanged;

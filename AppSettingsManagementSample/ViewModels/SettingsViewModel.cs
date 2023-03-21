@@ -12,9 +12,9 @@ namespace AppSettingsManagementSample.ViewModels
     public partial class SettingsViewModel : ObservableObject
     {
         [SettingsManager]
-        readonly SettingsManagerService Manager;
+        readonly SettingsService Manager;
 
-        public SettingsViewModel(SettingsManagerService manager)
+        public SettingsViewModel(SettingsService manager)
         {
             Manager = manager;
 

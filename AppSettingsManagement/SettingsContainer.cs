@@ -40,21 +40,27 @@ public abstract class SettingsContainer : ISettingsContainer
         Parent = parent;
     }
 
-    protected T? GetValue<T>(string key) where T : notnull
+    #region GetValue<T>
+
+
+    protected T? GetValue<T>(string key) where T : struct
     {
-        if (Storage.ContainsKey(key))
+        if (!Storage.ContainsKey(key))
         {
-            object value = Storage.GetValue<object>(key);
-            if (value is null)
-                return default;
-            else
-                return (T?)value;
+            return null;
         }
-        else // key is not found
+
+        return (T)Storage.GetValue<T>(key);
+    }
+
+    protected T? GetValueReferenceType<T>(string key) where T : class
+    {
+        if (!Storage.ContainsKey(key))
         {
-            //throw new KeyNotFoundException($"Key {key} is not found and default value is not provided.");
-            return default;
+            return null;
         }
+
+        return (T)Storage.GetValue<T>(key);
     }
 
     /// <summary>
@@ -80,11 +86,15 @@ public abstract class SettingsContainer : ISettingsContainer
         }
     }
 
+    #endregion
+
     #region SetValue<T>
 
     private void _setValue<T>(string key, T value, ref SettingChangedEventHandler? _event) where T : notnull
     {
         object? currentValue = Storage.ContainsKey(key) ? Storage.GetValue<T>(key) : null;
+
+        var t = typeof(T);
 
         // Only invoke events when the new value is different
         if (!value.Equals(currentValue))
