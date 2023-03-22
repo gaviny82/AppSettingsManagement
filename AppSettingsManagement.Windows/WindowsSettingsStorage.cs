@@ -11,20 +11,20 @@ public class WindowsSettingsStorage : ISettingsStorage
         container = ApplicationData.Current.LocalSettings;
     }
 
-    public bool ContainsKey(string key) => container.Values.ContainsKey(key);
+    public bool ContainsKey(string path) => container.Values.ContainsKey(key);
 
-    public void DeleteItem(string key)
+    public void DeleteItem(string path)
     {
-        container.Values.Remove(key);
+        container.Values.Remove(path);
     }
 
 
-    public object GetValue(string key, Type type)
+    public object GetValue(string path, Type type)
     {
-        if (!container.Values.ContainsKey(key))
-            throw new KeyNotFoundException($"Key {key} not found.");
+        if (!container.Values.ContainsKey(path))
+            throw new KeyNotFoundException($"Key {path} not found.");
 
-        var value = container.Values[key];
+        var value = container.Values[path];
         
         if (type == typeof(sbyte) ||
             type == typeof(byte) ||
@@ -53,18 +53,18 @@ public class WindowsSettingsStorage : ISettingsStorage
         }
     }
 
-    public void SetValue<T>(string key, T value) where T : notnull
+    public void SetValue<T>(string path, T value) where T : notnull
     {
         var type = typeof(T);
 
         if (type.IsEnum)
         {
             var integralValue = Convert.ChangeType(value, Enum.GetUnderlyingType(type));
-            container.Values[key] = integralValue;
+            container.Values[path] = integralValue;
         }
         else
         {
-            container.Values[key] = value;
+            container.Values[path] = value;
         }
     }
 }

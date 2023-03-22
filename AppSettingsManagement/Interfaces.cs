@@ -40,9 +40,9 @@ public interface ISettingsStorage
     /// Delete a setting item in the storage if the key exists .
     /// </summary>
     /// <param name="key"></param>
-    void DeleteItem(string key);
+    void DeleteItem(string path);
 
-    bool ContainsKey(string key);
+    bool ContainsKey(string path);
 
     /// <summary>
     /// Obtains the value of a setting item from the storage
@@ -52,12 +52,12 @@ public interface ISettingsStorage
     /// <returns>The value in the storage.</returns>
     /// <exception cref="ArgumentException">Throws if the object does not match the type parameter T</exception>
     /// <exception cref="KeyNotFoundException">Throws if the key is not found</exception>
-    T GetValue<T>(string key) where T: notnull
+    T GetValue<T>(string path) where T: notnull
     {
-        return (T)GetValue(key, typeof(T));
+        return (T)GetValue(path, typeof(T));
     }
 
-    object GetValue(string key, Type type);
+    object GetValue(string path, Type type);
 
 
     /// <summary>
@@ -66,5 +66,5 @@ public interface ISettingsStorage
     /// <typeparam name="T">Type of the value</typeparam>
     /// <param name="key">A unique key that refers to the value</param>
     /// <param name="value">The new value. The setting item is removed if value is null</param>
-    void SetValue<T>(string key, T value) where T : notnull;
+    void SetValue<T>(string path, T value) where T : notnull;
 }

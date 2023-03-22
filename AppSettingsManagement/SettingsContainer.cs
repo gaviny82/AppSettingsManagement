@@ -40,43 +40,36 @@ public abstract class SettingsContainer : ISettingsContainer
         Parent = parent;
     }
 
+
+    /// <summary>
+    /// Path to access the item in the hierarchical storage
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    private string GetPathFromKey(string key)
+    {
+        StringBuilder sb = new();
+
+        
+        sb.Append(key);
+        return sb.ToString();
+    }
+
     #region GetValue<T>
-
-
 
     protected T? GetValue<T>(string key)
     {
-        if (!Storage.ContainsKey(key))
+        var path = GetPathFromKey(key);
+
+        if (!Storage.ContainsKey(path))
         {
             return default(T?);
         }
 
         var type = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
-        
-        return (T)Storage.GetValue(key, type!);
+
+        return (T)Storage.GetValue(path, type!);
     }
-
-    protected T? GetValueR<T>(string key) where T : class
-    {
-        if (!Storage.ContainsKey(key))
-        {
-            return default(T?);
-        }
-
-        return Storage.GetValue<T>(key);
-    }
-
-    //protected T? GetValue<T>(string key)
-    //{
-    //    if (!Storage.ContainsKey(key))
-    //    {
-    //        return default;
-    //    }
-
-    //    #nullable disable
-    //    return (T)Storage.GetValue<T>(key);
-    //    #nullable enable
-    //}
 
     /// <summary>
     ///
@@ -90,13 +83,15 @@ public abstract class SettingsContainer : ISettingsContainer
         if (defaultValue is null)
             throw new ArgumentNullException(nameof(defaultValue));
 
-        if (Storage.ContainsKey(key))
+        var path = GetPathFromKey(key);
+
+        if (Storage.ContainsKey(path))
         {
-            return Storage.GetValue<T>(key);
+            return Storage.GetValue<T>(path);
         }
         else // key is not found
         {
-            Storage.SetValue(key, defaultValue);
+            Storage.SetValue(path, defaultValue);
             return defaultValue;
         }
     }
