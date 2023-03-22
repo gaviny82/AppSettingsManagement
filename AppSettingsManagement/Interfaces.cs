@@ -52,7 +52,13 @@ public interface ISettingsStorage
     /// <returns>The value in the storage.</returns>
     /// <exception cref="ArgumentException">Throws if the object does not match the type parameter T</exception>
     /// <exception cref="KeyNotFoundException">Throws if the key is not found</exception>
-    T GetValue<T>(string key) where T: notnull;
+    T GetValue<T>(string key) where T: notnull
+    {
+        return (T)GetValue(key, typeof(T));
+    }
+
+    object GetValue(string key, Type type);
+
 
     /// <summary>
     /// Sets a setting item to a new value and save the change in the storage

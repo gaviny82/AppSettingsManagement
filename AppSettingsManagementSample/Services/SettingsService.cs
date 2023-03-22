@@ -27,7 +27,7 @@ public partial class SettingsService : SettingsContainer
     [SettingItem(nameof(Username))]
     public string? Username // Autogenerate:
     {
-        get => GetValueReferenceType<string>(nameof(Username));
+        get => GetValue<string?>(nameof(Username));
         set => SetValue<string>(nameof(Username), value, ref UsernameChanged);
     }
 
@@ -56,7 +56,7 @@ public partial class SettingsService : SettingsContainer
     [SettingItem(nameof(Number))]
     public int? Number
     {
-        get => GetValue<int>(nameof(Number));
+        get => GetValue<int?>(nameof(Number));
         set => SetValue<int>(nameof(Number), value, ref NumberChanged);
     }
 
@@ -114,7 +114,7 @@ public class AccountContainer : SettingsContainer
     [SettingItem(nameof(Username))]
     public string? Username
     {
-        get => GetValueReferenceType<string>(nameof(Username));
+        get => GetValue<string?>(nameof(Username));
         set => SetValue<string>(nameof(Username), value, ref UsernameChanged);
     }
     public event SettingChangedEventHandler? UsernameChanged;
@@ -122,7 +122,7 @@ public class AccountContainer : SettingsContainer
     [SettingItem(nameof(Password))]
     public string? Password
     {
-        get => GetValueReferenceType<string>(nameof(Password));
+        get => GetValue<string?>(nameof(Password));
         set => SetValue<string>(nameof(Password), value, ref PasswordChanged);
     }
     public event SettingChangedEventHandler? PasswordChanged;

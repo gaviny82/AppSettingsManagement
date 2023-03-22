@@ -19,13 +19,12 @@ public class WindowsSettingsStorage : ISettingsStorage
     }
 
 
-    public T GetValue<T>(string key) where T : notnull
+    public object GetValue(string key, Type type)
     {
         if (!container.Values.ContainsKey(key))
             throw new KeyNotFoundException($"Key {key} not found.");
 
         var value = container.Values[key];
-        var type = typeof(T);
         
         if (type == typeof(sbyte) ||
             type == typeof(byte) ||
@@ -46,7 +45,7 @@ public class WindowsSettingsStorage : ISettingsStorage
             type.IsEnum // Enums are stored as integral types, which can be cast to enums automatically
             )
         {
-            return (T)value;
+            return value;
         }
         else
         {

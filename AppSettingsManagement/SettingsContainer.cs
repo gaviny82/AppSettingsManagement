@@ -43,25 +43,40 @@ public abstract class SettingsContainer : ISettingsContainer
     #region GetValue<T>
 
 
-    protected T? GetValue<T>(string key) where T : struct
+
+    protected T? GetValue<T>(string key)
     {
         if (!Storage.ContainsKey(key))
         {
-            return null;
+            return default(T?);
         }
 
-        return (T)Storage.GetValue<T>(key);
+        var type = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
+        
+        return (T)Storage.GetValue(key, type!);
     }
 
-    protected T? GetValueReferenceType<T>(string key) where T : class
+    protected T? GetValueR<T>(string key) where T : class
     {
         if (!Storage.ContainsKey(key))
         {
-            return null;
+            return default(T?);
         }
 
-        return (T)Storage.GetValue<T>(key);
+        return Storage.GetValue<T>(key);
     }
+
+    //protected T? GetValue<T>(string key)
+    //{
+    //    if (!Storage.ContainsKey(key))
+    //    {
+    //        return default;
+    //    }
+
+    //    #nullable disable
+    //    return (T)Storage.GetValue<T>(key);
+    //    #nullable enable
+    //}
 
     /// <summary>
     ///
