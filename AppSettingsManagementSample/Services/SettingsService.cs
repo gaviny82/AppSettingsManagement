@@ -82,9 +82,11 @@ public partial class SettingsService : SettingsContainer
     [SettingItem(nameof(Theme), Default = Theme.Default)]
     public Theme Theme
     {
-        get => GetValue<Theme>(nameof(NumberWithDefault), Theme.Default);
-        set => SetValue<Theme>(nameof(NumberWithDefault), value, ref NumberWithDefaultChanged);
+        get => GetValue<Theme>(nameof(Theme), Theme.Default);
+        set => SetValue<Theme>(nameof(Theme), value, ref ThemeChanged);
     }
+
+    public event SettingChangedEventHandler? ThemeChanged;
 
     #endregion
 

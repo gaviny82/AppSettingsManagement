@@ -48,6 +48,7 @@ namespace AppSettingsManagementSample
 
             ResetSettings();
             var num = SettingsManager.Number;
+            Theme t = SettingsManager.Theme;
             var a = 1;
             // Cannot be used in unpackaged mode
 
@@ -77,5 +78,4 @@ namespace AppSettingsManagementSample
         }
     }
 
-    public enum Theme { Dark, Light }
 }

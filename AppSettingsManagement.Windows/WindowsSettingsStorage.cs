@@ -43,7 +43,7 @@ public class WindowsSettingsStorage : ISettingsStorage
             type == typeof(char) ||
             type == typeof(string) ||
             
-            type == typeof(Enum) // Enums are stored as integral types, which can be cast to enums automatically
+            type.IsEnum // Enums are stored as integral types, which can be cast to enums automatically
             )
         {
             return (T)value;
@@ -58,7 +58,7 @@ public class WindowsSettingsStorage : ISettingsStorage
     {
         var type = typeof(T);
 
-        if (type == typeof(Enum))
+        if (type.IsEnum)
         {
             var integralValue = Convert.ChangeType(value, Enum.GetUnderlyingType(type));
             container.Values[key] = integralValue;
