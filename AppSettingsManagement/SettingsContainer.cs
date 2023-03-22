@@ -48,9 +48,19 @@ public abstract class SettingsContainer : ISettingsContainer
     /// <returns></returns>
     private string GetPathFromKey(string key)
     {
-        StringBuilder sb = new();
+        Stack<string> levels = new();
+        ISettingsContainer container = this;
+        while (container.Parent is not null)
+        {
+            levels.Push(container.Name);
+            container = container.Parent;
+        }
 
-        
+        StringBuilder sb = new();
+        foreach (string item in levels)
+        {
+            sb.Append($"{item}/");
+        }
         sb.Append(key);
         return sb.ToString();
     }
