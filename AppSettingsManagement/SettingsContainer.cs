@@ -31,6 +31,7 @@ public abstract class SettingsContainer : ISettingsContainer
     {
         Storage = storage;
         Name = ROOT_CONTAINER_NAME;
+        InitializeContainers();
     }
 
     public SettingsContainer(ISettingsStorage storage, string name, ISettingsContainer parent)
@@ -38,7 +39,11 @@ public abstract class SettingsContainer : ISettingsContainer
         Storage = storage;
         Name = name;
         Parent = parent;
+        InitializeContainers();
     }
+
+    // Overrided by derived classes to initialize containers. Called automatically in the constructors
+    protected virtual void InitializeContainers() { }
 
 
     /// <summary>
@@ -112,17 +117,19 @@ public abstract class SettingsContainer : ISettingsContainer
 
     private void _setValue<T>(string key, T value, ref SettingChangedEventHandler? _event) where T : notnull
     {
-        object? currentValue = Storage.ContainsKey(key) ? Storage.GetValue<T>(key) : null;
+        var path = GetPathFromKey(key);
+
+        object? currentValue = Storage.ContainsKey(path) ? Storage.GetValue<T>(path) : null;
 
         var t = typeof(T);
 
         // Only invoke events when the new value is different
         if (!value.Equals(currentValue))
         {
-            Storage.SetValue(key, (T)value);
+            Storage.SetValue(path, (T)value);
 
-            _event?.Invoke(this, new SettingChangedEventArgs(key, value));
-            SettingsChanged?.Invoke(this, new SettingChangedEventArgs(key, value));
+            _event?.Invoke(this, new SettingChangedEventArgs(path, value));
+            SettingsChanged?.Invoke(this, new SettingChangedEventArgs(path, value));
         }
     }
 

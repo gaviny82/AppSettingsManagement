@@ -16,44 +16,50 @@ public partial class SettingsService
 public partial class SettingsService : SettingsContainer
 {
     static ISettingsStorage Provider = new WindowsSettingsStorage();
-    public SettingsService() : base(Provider) 
+
+#nullable disable
+    public SettingsService() : base(Provider) { }
+#nullable enable
+
+    // Autogenerate:
+    protected override void InitializeContainers()
     {
-        // Autogenerate:
-        ActiveAccount = new(Provider, nameof(ActiveAccount), this);
+        ActiveAccount = new(Storage, nameof(ActiveAccount), this);
     }
 
-    #region Username
 
-    [SettingItem(nameof(Username))]
-    public string? Username // Autogenerate:
+    // Used to test properties without default
+    #region UsernameWithoutDefault
+
+    [SettingItem(nameof(UsernameWithoutDefault))]
+    public string? UsernameWithoutDefault // Autogenerate:
     {
-        get => GetValue<string?>(nameof(Username));
-        set => SetValue<string>(nameof(Username), value, ref UsernameChanged);
+        get => GetValue<string?>(nameof(UsernameWithoutDefault));
+        set => SetValue<string>(nameof(UsernameWithoutDefault), value, ref UsernameWithoutDefaultChanged);
     }
 
     // Autogenerate:
-    public event SettingChangedEventHandler? UsernameChanged;
+    public event SettingChangedEventHandler? UsernameWithoutDefaultChanged;
 
     #endregion
 
-    #region UsernameWithDefault
+    // Used to test properties without default
+    #region NumberWithoutDefault
 
-    [SettingItem(nameof(UsernameWithDefault), Default = "")]
-    public string UsernameWithDefault // Autogenerate:
+    [SettingItem(nameof(NumberWithoutDefault))]
+    public int NumberWithoutDefault
     {
-        get => GetValue<string>(nameof(UsernameWithDefault), "");
-        set => SetValue<string>(nameof(UsernameWithDefault), value, ref UsernameWithDefaultChanged);
+        get => GetValue<int>(nameof(NumberWithoutDefault), 10);
+        set => SetValue<int>(nameof(NumberWithoutDefault), value, ref NumberWithDefaultChanged);
     }
 
-    // Autogenerate:
-    public event SettingChangedEventHandler? UsernameWithDefaultChanged;
+    public event SettingChangedEventHandler? NumberWithDefaultChanged;
 
     #endregion
-
 
     #region Number
 
-    [SettingItem(nameof(Number))]
+    [SettingItem(nameof(Number), Default = 10)]
     public int? Number
     {
         get => GetValue<int?>(nameof(Number));
@@ -61,19 +67,6 @@ public partial class SettingsService : SettingsContainer
     }
 
     public event SettingChangedEventHandler? NumberChanged;
-
-    #endregion
-
-    #region NumberWithDefault
-
-    [SettingItem(nameof(NumberWithDefault), Default = 10)]
-    public int NumberWithDefault
-    {
-        get => GetValue<int>(nameof(NumberWithDefault), 10);
-        set => SetValue<int>(nameof(NumberWithDefault), value, ref NumberWithDefaultChanged);
-    }
-
-    public event SettingChangedEventHandler? NumberWithDefaultChanged;
 
     #endregion
 
@@ -93,7 +86,7 @@ public partial class SettingsService : SettingsContainer
     // Composite values
 
     [SettingsContainer(nameof(ActiveAccount))]
-    public AccountContainer ActiveAccount { get; init; }
+    public AccountInformation ActiveAccount { get; private set; }
 
 
     // TODO: Arrays
@@ -107,22 +100,23 @@ public enum Theme
     Default
 }
 
-public class AccountContainer : SettingsContainer
+public class AccountInformation : SettingsContainer
 {
-    public AccountContainer(ISettingsStorage storage, string name, ISettingsContainer parent) : base(storage, name, parent) { }
+    public AccountInformation(ISettingsStorage storage, string name, ISettingsContainer parent) : base(storage, name, parent) { }
 
-    [SettingItem(nameof(Username))]
-    public string? Username
+    [SettingItem(nameof(Username), Default = "a")]
+    public string Username
     {
-        get => GetValue<string?>(nameof(Username));
+        get => GetValue<string>(nameof(Username), "a");
         set => SetValue<string>(nameof(Username), value, ref UsernameChanged);
     }
     public event SettingChangedEventHandler? UsernameChanged;
 
-    [SettingItem(nameof(Password))]
-    public string? Password
+
+    [SettingItem(nameof(Password), Default = "b")]
+    public string Password
     {
-        get => GetValue<string?>(nameof(Password));
+        get => GetValue<string>(nameof(Password), "b");
         set => SetValue<string>(nameof(Password), value, ref PasswordChanged);
     }
     public event SettingChangedEventHandler? PasswordChanged;

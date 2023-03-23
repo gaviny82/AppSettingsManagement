@@ -8,12 +8,12 @@ namespace AppSettingsManagement;
 
 public class SettingChangedEventArgs
 {
-    public string Key { get; init; }
+    public string Path { get; init; }
     public object? NewValue { get; init; }
 
-    public SettingChangedEventArgs(string key, object? value)
+    public SettingChangedEventArgs(string path, object? value)
     {
-        Key = key;
+        Path = path;
         NewValue = value;
     }
 }

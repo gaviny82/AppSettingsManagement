@@ -11,7 +11,7 @@ public class WindowsSettingsStorage : ISettingsStorage
         container = ApplicationData.Current.LocalSettings;
     }
 
-    public bool ContainsKey(string path) => container.Values.ContainsKey(key);
+    public bool ContainsKey(string path) => container.Values.ContainsKey(path);
 
     public void DeleteItem(string path)
     {

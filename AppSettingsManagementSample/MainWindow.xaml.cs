@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using AppSettingsManagementSample.Services;
+using AppSettingsManagementSample.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -30,8 +31,6 @@ namespace AppSettingsManagementSample
     /// </summary>
     public sealed partial class MainWindow : Window
     {
-        public string TestString { get; set; }
-
         public SettingsService SettingsManager { get; } = new();
         ApplicationDataContainer LocalSettings = ApplicationData.Current.LocalSettings;
 
@@ -46,35 +45,12 @@ namespace AppSettingsManagementSample
         {
             this.InitializeComponent();
 
+            panel.DataContext = new SettingsViewModel(SettingsManager);
+        }
+
+        private void Reset_Click(object sender, RoutedEventArgs e)
+        {
             ResetSettings();
-            var num = SettingsManager.Number;
-            Theme t = SettingsManager.Theme;
-            var a = 1;
-            // Cannot be used in unpackaged mode
-
-            // Test: Create child containers
-            //var accountsContainer = localSettings.CreateContainer("Accounts", ApplicationDataCreateDisposition.Always);
-            //accountsContainer.Values["Username"] = "USERNAME";
-
-            // Test: Storing arrays
-            //int[] ints = { 1, 2, 3 };
-            //localSettings.Values["ExampleArray"] = ints;
-
-            //string[] strs = { "str1", "str2" };
-            //localSettings.Values["StrArray"] = strs;
-
-            //Array a;
-        }
-
-        private void setNumber_Click(object sender, RoutedEventArgs e)
-        {
-            var n = SettingsManager.Number;
-            SettingsManager.Number = 3123;
-        }
-
-        private void setString_Click(object sender, RoutedEventArgs e)
-        {
-            SettingsManager.Username = "Name 1";
         }
     }
 

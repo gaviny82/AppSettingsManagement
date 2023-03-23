@@ -11,13 +11,22 @@
     mc:Ignorable="d">
 
     <StackPanel
+        x:Name="panel"
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
         Orientation="Vertical"
         Spacing="4">
 
-        <Button Click="setNumber_Click">Set Number</Button>
-        <Button Click="setString_Click">Set String</Button>
+        <Button Content="Reset all settings" Click="Reset_Click"/>
+        <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Account Information" />
+        <TextBox
+            PlaceholderText="Username"
+            Text="{Binding Username, Mode=TwoWay}"
+            ToolTipService.ToolTip="Account" />
+        <TextBox
+            PlaceholderText="Password"
+            Text="{Binding Password, Mode=TwoWay}"
+            ToolTipService.ToolTip="Password" />
 
     </StackPanel>
 </Window>
