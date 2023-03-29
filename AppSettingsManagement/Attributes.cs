@@ -16,7 +16,7 @@ namespace AppSettingsManagement
     /// <summary>
     /// Must be applied to properties of a class which extends SettingsManagerBase
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field)]
     public class SettingItemAttribute : Attribute
     {
         public string Key { get; set; }

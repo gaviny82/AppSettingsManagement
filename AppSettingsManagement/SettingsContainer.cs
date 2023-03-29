@@ -23,6 +23,7 @@ public abstract class SettingsContainer : ISettingsContainer
 
     #endregion ISettingsContainer Members
 
+
     /// <summary>
     /// Used to initialize the root container
     /// </summary>
@@ -42,7 +43,9 @@ public abstract class SettingsContainer : ISettingsContainer
         InitializeContainers();
     }
 
-    // Overrided by derived classes to initialize containers. Called automatically in the constructors
+    /// <summary>
+    /// Initialize child containers
+    /// </summary>
     protected virtual void InitializeContainers() { }
 
 
