@@ -13,6 +13,7 @@ namespace AppSettingsManagementSample.Services;
 /// </summary>
 internal partial class SettingsService
 {
+    // Whether to use nullable type depends on if a default value is provided.
     public string? UsernameWithoutDefault // Autogenerate:
     {
         get => GetValue<string?>(nameof(UsernameWithoutDefault));
@@ -22,18 +23,18 @@ internal partial class SettingsService
     public event SettingChangedEventHandler? UsernameWithoutDefaultChanged;
 
 
-    public int NumberWithoutDefault
+    public int? NumberWithoutDefault
     {
-        get => GetValue<int>(nameof(NumberWithoutDefault), 10);
+        get => GetValue<int?>(nameof(NumberWithoutDefault));
         set => SetValue<int>(nameof(NumberWithoutDefault), value, ref NumberWithDefaultChanged);
     }
 
     public event SettingChangedEventHandler? NumberWithDefaultChanged;
 
 
-    public int? Number
+    public int Number
     {
-        get => GetValue<int?>(nameof(Number));
+        get => GetValue<int>(nameof(Number), 10);
         set => SetValue<int>(nameof(Number), value, ref NumberChanged);
     }
 
@@ -60,29 +61,24 @@ internal partial class SettingsService : SettingsContainer
 {
     static readonly ISettingsStorage Provider = new WindowsSettingsStorage();
 
+    #region Settings
+
+    [SettingItem(typeof(string), "UsernameWithoutDefault")] // Used to test properties without default
+
+    [SettingItem(typeof(int), "NumberWithoutDefault")] // Used to test properties without default
+    [SettingItem(typeof(int), "Number", Default = 10)]
+
+    [SettingItem(typeof(Theme), "Theme", Default = Theme.Default)]
+
+    #endregion
+
     public SettingsService() : base(Provider) { }
 
 
-    // Used to test properties without default
-    [SettingItem(nameof(UsernameWithoutDefault))]
-    string? usernameWithoutDefault;
-
-    // Used to test properties without default
-    [SettingItem(nameof(NumberWithoutDefault))]
-    int numberWithoutDefault;
-
-    [SettingItem(nameof(Number), Default = 10)]
-    int? number;
-
-    [SettingItem(nameof(Theme), Default = Theme.Default)]
-    Theme theme;
-
-
     // Composite values
-
+    // TODO: autogenerate Settings Container definition, move to constructor
     [SettingsContainer(nameof(ActiveAccount))]
     public AccountInformation ActiveAccount { get; private set; } = null!;
-
 
     // TODO: Arrays
 
@@ -118,11 +114,12 @@ internal partial class AccountInformation
 
 internal partial class AccountInformation : SettingsContainer
 {
+    #region Settings
+
+    [SettingItem(typeof(string), "Username", Default = "a")]
+    [SettingItem(typeof(string), "Password", Default = "b")]
+
+    #endregion
+
     public AccountInformation(ISettingsStorage storage, string name, ISettingsContainer parent) : base(storage, name, parent) { }
-
-    [SettingItem(nameof(Username), Default = "a")]
-    string username = "";
-
-    [SettingItem(nameof(Password), Default = "b")]
-    string password = "";
 }

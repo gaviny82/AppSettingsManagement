@@ -29,7 +29,7 @@ internal partial class SettingsViewModel : SettingsViewModelBase
         settingChangedEventHandlers.Add(password_Handler);
         SettingsService.ActiveAccount.PasswordChanged += password_Handler;
     }
-
+    // TODO: use weak reference for events to avoid memory leak
     protected override void RemoveSettingsChagnedHandlers()
     {
         SettingsService.ActiveAccount.UsernameChanged -= settingChangedEventHandlers[0];

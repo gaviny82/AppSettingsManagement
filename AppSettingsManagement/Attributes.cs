@@ -16,19 +16,22 @@ namespace AppSettingsManagement
     /// <summary>
     /// Must be applied to properties of a class which extends SettingsManagerBase
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Constructor, AllowMultiple = true)]
     public class SettingItemAttribute : Attribute
     {
-        public string Key { get; set; }
+        public string Key { get; }
 
-        public Type? Type { get; set; }
+        /// <summary>
+        /// Type of the property when accessed
+        /// </summary>
+        public Type Type { get; }
 
-        public Type? Converter { get; set; }
+        public Type? Converter { get; init; }
 
         /// <summary>
         /// Default value of the setting item.<br/>null means default value is not provided.
         /// </summary>
-        public object? Default { get; set; }
+        public object? Default { get; init; }
 
         /// <summary>
         /// 
@@ -36,15 +39,10 @@ namespace AppSettingsManagement
         /// <param name="key">Key of the setting item</param>
         /// <param name="type">Data type of the value stored</param>
         /// <param name="converter">Allows conversion between the data type stored and the type of the property. If not specified, type casting will be used.</param>
-        public SettingItemAttribute(string key, Type? type = null, Type? converter = null)
+        public SettingItemAttribute(Type type, string key)
         {
             Key = key;
             Type = type;
-            
-            if (converter != null) 
-                throw new NotImplementedException();
-
-            Converter = converter;
         }
 
     }
