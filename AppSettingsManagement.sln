@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppSettingsManagementSample
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppSettingsManagement.Windows", "AppSettingsManagement.Windows\AppSettingsManagement.Windows.csproj", "{00F56CC7-D3FC-4633-97E0-0064BDFEB3BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppSettingsManagement.Test.Windows", "AppSettingsManagement.Test\AppSettingsManagement.Test.Windows.csproj", "{AD8E7AC7-7CCC-4B9D-95D1-14B34F31563A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppSettingsManagement.Test.Windows", "AppSettingsManagement.Test\AppSettingsManagement.Test.Windows.csproj", "{AD8E7AC7-7CCC-4B9D-95D1-14B34F31563A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppSettingsManagement.SourceGenerators", "AppSettingsManagement.SourceGenerators\AppSettingsManagement.SourceGenerators.csproj", "{BE8F4467-92E1-40B0-8466-659E334E9C60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +97,22 @@ Global
 		{AD8E7AC7-7CCC-4B9D-95D1-14B34F31563A}.Release|x64.Build.0 = Release|Any CPU
 		{AD8E7AC7-7CCC-4B9D-95D1-14B34F31563A}.Release|x86.ActiveCfg = Release|Any CPU
 		{AD8E7AC7-7CCC-4B9D-95D1-14B34F31563A}.Release|x86.Build.0 = Release|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Debug|arm64.Build.0 = Debug|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Debug|x64.Build.0 = Debug|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Debug|x86.Build.0 = Debug|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Release|arm64.ActiveCfg = Release|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Release|arm64.Build.0 = Release|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Release|x64.ActiveCfg = Release|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Release|x64.Build.0 = Release|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Release|x86.ActiveCfg = Release|Any CPU
+		{BE8F4467-92E1-40B0-8466-659E334E9C60}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,50 +15,50 @@ namespace AppSettingsManagementSample.Services;
 /// </summary>
 internal partial class SettingsService
 {
-    // Whether to use nullable type depends on if a default value is provided.
-    public string? UsernameWithoutDefault // Autogenerate:
-    {
-        get => GetValue<string?>(nameof(UsernameWithoutDefault));
-        set => SetValue<string>(nameof(UsernameWithoutDefault), value, ref UsernameWithoutDefaultChanged);
-    }
+//    // Whether to use nullable type depends on if a default value is provided.
+//    public string? UsernameWithoutDefault // Autogenerate:
+//    {
+//        get => GetValue<string?>(nameof(UsernameWithoutDefault));
+//        set => SetValue<string>(nameof(UsernameWithoutDefault), value, ref UsernameWithoutDefaultChanged);
+//    }
 
-    public event SettingChangedEventHandler? UsernameWithoutDefaultChanged;
-
-
-    public int? NumberWithoutDefault
-    {
-        get => GetValue<int?>(nameof(NumberWithoutDefault));
-        set => SetValue<int>(nameof(NumberWithoutDefault), value, ref NumberWithDefaultChanged);
-    }
-
-    public event SettingChangedEventHandler? NumberWithDefaultChanged;
+//    public event SettingChangedEventHandler? UsernameWithoutDefaultChanged;
 
 
-    public int Number
-    {
-        get => GetValue<int>(nameof(Number), 10);
-        set => SetValue<int>(nameof(Number), value, ref NumberChanged);
-    }
+//    public int? NumberWithoutDefault
+//    {
+//        get => GetValue<int?>(nameof(NumberWithoutDefault));
+//        set => SetValue<int>(nameof(NumberWithoutDefault), value, ref NumberWithDefaultChanged);
+//    }
 
-    public event SettingChangedEventHandler? NumberChanged;
+//    public event SettingChangedEventHandler? NumberWithDefaultChanged;
 
 
-    public Theme Theme
-    {
-        get => GetValue<Theme>(nameof(Theme), Theme.Default);
-        set => SetValue<Theme>(nameof(Theme), value, ref ThemeChanged);
-    }
+//    public int Number
+//    {
+//        get => GetValue<int>(nameof(Number), 10);
+//        set => SetValue<int>(nameof(Number), value, ref NumberChanged);
+//    }
 
-    public event SettingChangedEventHandler? ThemeChanged;
+//    public event SettingChangedEventHandler? NumberChanged;
+
+
+//    public Theme Theme
+//    {
+//        get => GetValue<Theme>(nameof(Theme), Theme.Default);
+//        set => SetValue<Theme>(nameof(Theme), value, ref ThemeChanged);
+//    }
+
+//    public event SettingChangedEventHandler? ThemeChanged;
 
 
     public AccountInformation ActiveAccount { get; private set; } = null!;
 
 
-    protected override void InitializeContainers()
-    {
-        ActiveAccount = new(Storage, nameof(ActiveAccount), this);
-    }
+//    protected override void InitializeContainers()
+//    {
+//        ActiveAccount = new(Storage, nameof(ActiveAccount), this);
+//    }
 
 }
 

@@ -41,7 +41,8 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AppSettingsManagement.Windows\AppSettingsManagement.Windows.csproj" />
+    <ProjectReference Include="..\AppSettingsManagement.Windows\AppSettingsManagement.Windows.csproj"/>
+    <ProjectReference Include="..\AppSettingsManagement.SourceGenerators\AppSettingsManagement.SourceGenerators.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
   </ItemGroup>
 
   <!-- 
