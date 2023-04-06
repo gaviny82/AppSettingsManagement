@@ -16,6 +16,8 @@ namespace AppSettingsManagementSample.ViewModels;
 /// </summary>
 internal partial class SettingsViewModel : SettingsViewModelBase
 {
+    private SettingsService SettingsService => (SettingsService)base.SettingsContainer;
+
     // Initialize view model and register events for updating view model when settings are changed.
     protected override void InitializeSettings()
     {
@@ -32,6 +34,8 @@ internal partial class SettingsViewModel : SettingsViewModelBase
     // TODO: use weak reference for events to avoid memory leak
     protected override void RemoveSettingsChagnedHandlers()
     {
+        var settingsService = (SettingsService)SettingsContainer;
+
         SettingsService.ActiveAccount.UsernameChanged -= settingChangedEventHandlers[0];
         SettingsService.ActiveAccount.PasswordChanged -= settingChangedEventHandlers[1];
     }
@@ -50,12 +54,8 @@ internal partial class SettingsViewModel : SettingsViewModelBase
 
 internal partial class SettingsViewModel : SettingsViewModelBase
 {
-    private readonly SettingsService SettingsService;
 
-    public SettingsViewModel(SettingsService settingsService) : base(settingsService)
-    {
-        SettingsService = (SettingsService)base.SettingsContainer;
-    }
+    public SettingsViewModel(SettingsService settingsService) : base(settingsService) { }
 
 
     [ObservableProperty]

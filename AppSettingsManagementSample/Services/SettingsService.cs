@@ -16,10 +16,10 @@ internal partial class SettingsService
 {
     public AccountInformation ActiveAccount { get; private set; } = null!;
 
-//    protected override void InitializeContainers()
-//    {
-//        ActiveAccount = new(Storage, nameof(ActiveAccount), this);
-//    }
+    protected override void InitializeContainers()
+    {
+        ActiveAccount = new(Storage, nameof(ActiveAccount), this);
+    }
 
 }
 
@@ -42,7 +42,8 @@ internal partial class SettingsService : SettingsContainer
 
     public SettingsService() : base(Provider) { }
 
-    // TODO: Arrays 
+    // Arrays 
+    public SettingsCollection<string> Names { get; } = new(Provider, "Names");
 }
 
 public enum Theme

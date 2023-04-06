@@ -21,6 +21,8 @@ public class WindowsSettingsStorage : ISettingsStorage
 
     public object GetValue(string path, Type type)
     {
+        if (type.IsArray) return container.Values[path]; // Automatically returns null if not exist
+        
         if (!container.Values.ContainsKey(path))
             throw new KeyNotFoundException($"Key {path} not found.");
 
@@ -40,8 +42,9 @@ public class WindowsSettingsStorage : ISettingsStorage
             type == typeof(decimal) ||
             
             type == typeof(char) ||
-            type == typeof(string) ||
-            
+            type == typeof(string) || type == typeof(string[]) ||
+
+
             type.IsEnum // Enums are stored as integral types, which can be cast to enums automatically
             )
         {
@@ -59,11 +62,19 @@ public class WindowsSettingsStorage : ISettingsStorage
 
         if (type.IsEnum)
         {
+            // Store enums as their integral types
             var integralValue = Convert.ChangeType(value, Enum.GetUnderlyingType(type));
             container.Values[path] = integralValue;
         }
+        else if (type.IsArray)
+        {
+            // If array is empty, remove the item, since empty array cannot be stored.
+            if (value is Array { Length: 0 })
+                container.Values[path] = null;
+        }
         else
         {
+            // Single values of supported types
             container.Values[path] = value;
         }
     }

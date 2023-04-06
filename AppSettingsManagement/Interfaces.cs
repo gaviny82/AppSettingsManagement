@@ -68,3 +68,16 @@ public interface ISettingsStorage
     /// <param name="value">The new value. The setting item is removed if value is null</param>
     void SetValue<T>(string path, T value) where T : notnull;
 }
+
+/// <summary>
+/// ConvertFrom is used when converting an object from the displayed type to the stored type.
+/// ConvertTo is used when converting an object from the stored type to the displayed type.
+/// </summary>
+public interface IDataTypeConverter
+{
+    Type SourceType { get; }
+    Type TargetType { get; }
+
+    object Convert(object source);
+    object ConvertFrom(object target);
+}
