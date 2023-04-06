@@ -52,6 +52,11 @@ namespace AppSettingsManagementSample
         {
             ResetSettings();
         }
+
+        private void AddStr_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsManager.Names.Add("New item");
+        }
     }
 
 }

@@ -18,6 +18,7 @@
         Spacing="4">
 
         <Button Content="Reset all settings" Click="Reset_Click"/>
+        <Button Content="Add str item" Click="AddStr_Click"/>
         <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Account Information" />
         <TextBox
             PlaceholderText="Username"

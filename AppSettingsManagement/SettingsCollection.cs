@@ -59,12 +59,12 @@ public class SettingsCollection<T> : ObservableCollection<T>
                 _settingsStorage.SetValue(storagePath, Array.Empty<T>());
 
             var arrayStored = _settingsStorage.GetValue(storagePath, typeof(T).MakeArrayType());
-            if (arrayStored is not T[] arr)
-                return;
+            if (arrayStored is T[] arr)
+            {
+                foreach (T value in arr)
+                    Add(value);
+            }
 
-            foreach (T value in arr)
-                Add(value);
-            
         }
         CollectionChanged += SettingsCollection_CollectionChanged;
     }

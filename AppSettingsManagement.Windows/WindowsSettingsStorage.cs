@@ -68,9 +68,11 @@ public class WindowsSettingsStorage : ISettingsStorage
         }
         else if (type.IsArray)
         {
-            // If array is empty, remove the item, since empty array cannot be stored.
+            // If array is empty, remove the item, because empty array cannot be stored in ApplicationDataContainer.
             if (value is Array { Length: 0 })
                 container.Values[path] = null;
+            else if (value is Array)
+                container.Values[path] = value;
         }
         else
         {
