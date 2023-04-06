@@ -3,6 +3,7 @@ using AppSettingsManagementSample.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -30,6 +31,8 @@ internal partial class SettingsViewModel : SettingsViewModelBase
         var password_Handler = new SettingChangedEventHandler((_, _) => { Password = SettingsService.ActiveAccount.Password; });
         settingChangedEventHandlers.Add(password_Handler);
         SettingsService.ActiveAccount.PasswordChanged += password_Handler;
+
+        TestNames = SettingsService.Names;
     }
     // TODO: use weak reference for events to avoid memory leak
     protected override void RemoveSettingsChagnedHandlers()
@@ -57,6 +60,8 @@ internal partial class SettingsViewModel : SettingsViewModelBase
 
     public SettingsViewModel(SettingsService settingsService) : base(settingsService) { }
 
+    // Bind to settings service
+    public ObservableCollection<string>? TestNames { get; private set; }
 
     [ObservableProperty]
     string? username;

@@ -13,13 +13,13 @@ public class SettingsCollection<T> : ObservableCollection<T>
 {
     private readonly ISettingsStorage _settingsStorage;
     private readonly IDataTypeConverter? _typeConverter;
-    private readonly string _settingsKey;// TODO: full path
+    private readonly string _storagePath;
 
 
-    public SettingsCollection(ISettingsStorage settingsStorage, string settingsKey, IDataTypeConverter? typeConverter = null)
+    public SettingsCollection(ISettingsStorage settingsStorage, string storagePath, IDataTypeConverter? typeConverter = null)
     {
         _settingsStorage = settingsStorage;
-        _settingsKey = settingsKey;
+        _storagePath = storagePath;
         
         if (typeConverter is not null)
         {
@@ -55,10 +55,10 @@ public class SettingsCollection<T> : ObservableCollection<T>
         }
         else // T is the type stored
         {
-            if (!_settingsStorage.ContainsKey(settingsKey)) //return;
-                _settingsStorage.SetValue(settingsKey, Array.Empty<T>());
+            if (!_settingsStorage.ContainsKey(storagePath))
+                _settingsStorage.SetValue(storagePath, Array.Empty<T>());
 
-            var arrayStored = _settingsStorage.GetValue(settingsKey, typeof(T).MakeArrayType());
+            var arrayStored = _settingsStorage.GetValue(storagePath, typeof(T).MakeArrayType());
             if (arrayStored is not T[] arr)
                 return;
 
@@ -73,6 +73,6 @@ public class SettingsCollection<T> : ObservableCollection<T>
     {
         // Save the entire collection as an array to the storage after converting it
         //object convertedValue = _typeConverter.ConvertFrom(this.ToArray());
-        _settingsStorage.SetValue(_settingsKey, this.ToArray());
+        _settingsStorage.SetValue(_storagePath, this.ToArray());
     }
 }

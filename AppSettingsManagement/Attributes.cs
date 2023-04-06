@@ -51,17 +51,36 @@ namespace AppSettingsManagement
     /// <summary>
     /// Indicate that the property is used as a settings container.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Constructor)]
+    [AttributeUsage(AttributeTargets.Constructor, AllowMultiple = true)]
     public class SettingsContainerAttribute : Attribute
     {
         public string ContainerName { get; }
-
         public Type ContainerType { get; }
 
         public SettingsContainerAttribute(Type type, string name)
         {
             ContainerType = type;
             ContainerName = name;
+        }
+    }
+
+    /// <summary>
+    /// Defines a collection of settings of the same type
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Constructor, AllowMultiple = true)]
+    public class SettingsCollectionAttribute : Attribute
+    {
+        public string CollectionName { get; }
+        public Type CollectionType { get; }
+
+        // TODO: implement type converter
+        public Type? Converter { get; init; }
+
+        public SettingsCollectionAttribute(Type type, string name, Type? converter = null)
+        {
+            CollectionName = name;
+            CollectionType = type;
+            Converter = converter;
         }
     }
 }
