@@ -22,18 +22,13 @@ public interface ISettingsContainer
 }
 
 /// <summary>
-/// Allows settings to be stored on a device. The implementation should load the settings when instantiated.
+/// Allows settings to be stored on a device. Class implementing this interface should load the settings when instantiated.
 /// 
-/// A setting item can be any of the following types:
-/// - Integers: int, short, byte
-/// - Reals: float, double
-/// - bool
-/// - enum
-/// - char, string
-/// - Structs
-/// - IList<T> where T is one of the types above
-/// - Other classes (labelled as SettingsContainer)
 /// </summary>
+/// <remarks>
+/// The types accepted by the storage provider depends on the implementation.<br/>
+/// If the provider does not support a type, a IDataTypeConvert may be used to convert the type to a supported type.
+/// </remarks>
 public interface ISettingsStorage
 {
     /// <summary>
@@ -48,36 +43,27 @@ public interface ISettingsStorage
     /// Obtains the value of a setting item from the storage
     /// </summary>
     /// <typeparam name="T">Type of the value</typeparam>
-    /// <param name="key">A unique key that refers to the value</param>
+    /// <param name="path">A unique path that represents the location of an entry in the settings storage</param>
+    /// <param name="converter">An optional converter that allows type convertion between the type accessed in code and the actual type stored.</param>
     /// <returns>The value in the storage.</returns>
     /// <exception cref="ArgumentException">Throws if the object does not match the type parameter T</exception>
     /// <exception cref="KeyNotFoundException">Throws if the key is not found</exception>
-    T GetValue<T>(string path) where T: notnull
+    /// <remarks>If a type converter is specified, the storage provider will be responsible for converting the type stored
+    /// <br/> into T when the item is accessed, and converting T into the type used in storage.</remarks>
+    T GetValue<T>(string path, IDataTypeConverter? converter = null) where T: notnull
     {
         return (T)GetValue(path, typeof(T));
     }
 
-    object GetValue(string path, Type type);
+    object GetValue(string path, Type type, IDataTypeConverter? converter = null);
 
 
     /// <summary>
     /// Sets a setting item to a new value and save the change in the storage
     /// </summary>
     /// <typeparam name="T">Type of the value</typeparam>
-    /// <param name="key">A unique key that refers to the value</param>
+    /// <param name="path">A unique path that represents the location of an entry in the settings storage</param>
     /// <param name="value">The new value. The setting item is removed if value is null</param>
-    void SetValue<T>(string path, T value) where T : notnull;
-}
-
-/// <summary>
-/// ConvertFrom is used when converting an object from the displayed type to the stored type.
-/// ConvertTo is used when converting an object from the stored type to the displayed type.
-/// </summary>
-public interface IDataTypeConverter
-{
-    Type SourceType { get; }
-    Type TargetType { get; }
-
-    object Convert(object source);
-    object ConvertFrom(object target);
+    /// <param name="converter">An optional converter that allows type convertion between the type accessed in code and the actual type stored.</param>
+    void SetValue<T>(string path, T value, IDataTypeConverter? converter = null) where T : notnull;
 }

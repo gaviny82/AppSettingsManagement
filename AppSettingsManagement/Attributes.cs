@@ -35,7 +35,7 @@ namespace AppSettingsManagement
         public object? Default { get; init; }
 
         /// <summary>
-        /// 
+        /// Initialize a new instance of the SettingItemAttribute class
         /// </summary>
         /// <param name="key">Key of the setting item</param>
         /// <param name="type">Data type of the value stored</param>
@@ -76,11 +76,10 @@ namespace AppSettingsManagement
         // TODO: implement type converter
         public Type? Converter { get; init; }
 
-        public SettingsCollectionAttribute(Type type, string name, Type? converter = null)
+        public SettingsCollectionAttribute(Type type, string name)
         {
             CollectionName = name;
             CollectionType = type;
-            Converter = converter;
         }
     }
 }

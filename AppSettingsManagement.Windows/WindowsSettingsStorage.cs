@@ -19,7 +19,7 @@ public class WindowsSettingsStorage : ISettingsStorage
     }
 
 
-    public object GetValue(string path, Type type)
+    public object GetValue(string path, Type type, IDataTypeConverter? converter = null)
     {
         if (type.IsArray) return container.Values[path]; // Automatically returns null if not exist
         
@@ -56,7 +56,7 @@ public class WindowsSettingsStorage : ISettingsStorage
         }
     }
 
-    public void SetValue<T>(string path, T value) where T : notnull
+    public void SetValue<T>(string path, T value, IDataTypeConverter? converter = null) where T : notnull
     {
         var type = typeof(T);
 
