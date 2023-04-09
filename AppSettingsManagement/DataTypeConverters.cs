@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 namespace AppSettingsManagement;
 
 /// <summary>
-/// ConvertFrom is used when converting an object from the displayed type to the stored type.
-/// ConvertTo is used when converting an object from the stored type to the displayed type.
+/// ConvertFrom is used when converting an object from the displayed type to the stored type. <br/>
+/// Convert is used when converting an object from the stored type to the displayed type.
 /// </summary>
 public interface IDataTypeConverter
 {
     Type SourceType { get; }
     Type TargetType { get; }
 
-    object Convert(object source);
-    object ConvertFrom(object target);
+    object? Convert(object? source);
+    object? ConvertFrom(object? target);
 }
 
 public static class DataTypeConverters

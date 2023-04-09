@@ -50,13 +50,9 @@ public interface ISettingsStorage
     /// <exception cref="KeyNotFoundException">Throws if the key is not found</exception>
     /// <remarks>If a type converter is specified, the storage provider will be responsible for converting the type stored
     /// <br/> into T when the item is accessed, and converting T into the type used in storage.</remarks>
-    T GetValue<T>(string path, IDataTypeConverter? converter = null) where T: notnull
-    {
-        return (T)GetValue(path, typeof(T));
-    }
+    T GetValue<T>(string path, IDataTypeConverter? converter = null) where T : notnull;
 
     object GetValue(string path, Type type, IDataTypeConverter? converter = null);
-
 
     /// <summary>
     /// Sets a setting item to a new value and save the change in the storage

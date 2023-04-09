@@ -1,7 +1,10 @@
 ﻿using Windows.Storage;
+using System.Linq;
+using System.Collections;
 
 namespace AppSettingsManagement.Windows;
 
+// Consider rename to WinRTSettingsStorage
 public class WindowsSettingsStorage : ISettingsStorage
 {
     readonly ApplicationDataContainer container;
@@ -18,15 +21,91 @@ public class WindowsSettingsStorage : ISettingsStorage
         container.Values.Remove(path);
     }
 
+    /// <inheritdoc/>
+    public T GetValue<T>(string path, IDataTypeConverter? converter = null) where T : notnull
+    {
+        var type = typeof(T);
+
+        // Arrays stored in ApplicationDataContainer
+        if (type.IsArray)
+        {
+            Type elementType = type.GetElementType()!;
+
+            // WinRT ApplicationDataContainer cannot store empty arrays.
+            if (container.Values.ContainsKey(path))
+            {
+                // Returns the stored array, which is not empty, if the key exsits.
+                object? value = container.Values[path];
+                if (value is not Array array)
+                    throw new Exception($"Item stored at path\"{path}\" is not an array");
+
+                // Convert the type of array elements
+                if (converter is not null && elementType == converter.SourceType)
+                {
+                    IList list = array;
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        list[i] = converter.Convert(list[i]);
+                    }
+                }
+
+                return (T)(object)array;
+            }
+            else
+            {
+                // If the array is empty, it is stored as null in the ApplicationDataContainer.
+                return (T)(object)Array.CreateInstance(elementType, 0);
+            }
+        }
+
+        // Single values stored in ApplicationDataContainer
+        return (T)GetSingleValue(path, typeof(T));
+    }
 
     public object GetValue(string path, Type type, IDataTypeConverter? converter = null)
     {
-        if (type.IsArray) return container.Values[path]; // Automatically returns null if not exist
-        
+        if (type.IsArray)
+        {
+            Type elementType = type.GetElementType()!;
+
+            // WinRT ApplicationDataContainer cannot store empty arrays.
+            if (container.Values.ContainsKey(path))
+            {
+                // Returns the stored array, which is not empty, if the key exsits.
+                object? value = container.Values[path];
+                if (value is not Array array)
+                    throw new Exception($"Item stored at path\"{path}\" is not an array");
+
+                // Convert the type of array elements
+                if (converter is not null && elementType == converter.SourceType)
+                {
+                    IList list = array;
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        list[i] = converter.Convert(list[i]);
+                    }
+                }
+
+                return array;
+            }
+            else
+            {
+                // If the array is empty, it is stored as null in the ApplicationDataContainer.
+                return Array.CreateInstance(elementType, 0);
+            }
+        }
+
+        // Single values stored in ApplicationDataContainer
+        return GetSingleValue(path, type, converter);
+    }
+
+    private object GetSingleValue(string path, Type type, IDataTypeConverter? converter = null)
+    {
+        object? value = container.Values[path];
+
         if (!container.Values.ContainsKey(path))
             throw new KeyNotFoundException($"Key {path} not found.");
 
-        var value = container.Values[path];
         
         if (type == typeof(sbyte) ||
             type == typeof(byte) ||
