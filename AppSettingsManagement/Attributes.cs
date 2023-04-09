@@ -6,29 +6,24 @@ using System.Threading.Tasks;
 
 namespace AppSettingsManagement
 {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class SettingsManagerAttribute : Attribute
-    {
-
-    }
-
-
     /// <summary>
     /// Must be applied to properties of a class which extends SettingsManagerBase
     /// </summary>
     [AttributeUsage(AttributeTargets.Constructor, AllowMultiple = true)]
     public class SettingItemAttribute : Attribute
     {
+        /// <summary>
+        /// Key of the setting item
+        /// </summary>
         public string Key { get; }
-
         /// <summary>
         /// Type of the property when accessed
         /// </summary>
         public Type Type { get; }
-
-        // TODO: implement type converter
+        /// <summary>
+        /// An optional converter to convert the value stored in the storage to the type of the property.<br/>If not specified, type casting will be used.
+        /// </summary>
         public Type? Converter { get; init; }
-
         /// <summary>
         /// Default value of the setting item.<br/>null means default value is not provided.
         /// </summary>
@@ -39,7 +34,6 @@ namespace AppSettingsManagement
         /// </summary>
         /// <param name="key">Key of the setting item</param>
         /// <param name="type">Data type of the value stored</param>
-        /// <param name="converter">Allows conversion between the data type stored and the type of the property. If not specified, type casting will be used.</param>
         public SettingItemAttribute(Type type, string key)
         {
             Key = key;
@@ -71,15 +65,13 @@ namespace AppSettingsManagement
     public class SettingsCollectionAttribute : Attribute
     {
         public string CollectionName { get; }
-        public Type CollectionType { get; }
-
-        // TODO: implement type converter
+        public Type ElementType { get; }
         public Type? Converter { get; init; }
 
         public SettingsCollectionAttribute(Type type, string name)
         {
             CollectionName = name;
-            CollectionType = type;
+            ElementType = type;
         }
     }
 }

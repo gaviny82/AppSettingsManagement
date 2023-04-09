@@ -37,7 +37,7 @@ public interface ISettingsStorage
     /// <param name="key"></param>
     void DeleteItem(string path);
 
-    bool ContainsKey(string path);
+    bool Contains(string path);
 
     /// <summary>
     /// Obtains the value of a setting item from the storage
@@ -50,9 +50,9 @@ public interface ISettingsStorage
     /// <exception cref="KeyNotFoundException">Throws if the key is not found</exception>
     /// <remarks>If a type converter is specified, the storage provider will be responsible for converting the type stored
     /// <br/> into T when the item is accessed, and converting T into the type used in storage.</remarks>
-    T GetValue<T>(string path, IDataTypeConverter? converter = null) where T : notnull;
+    T GetValue<T>(string path) where T : notnull;
 
-    object GetValue(string path, Type type, IDataTypeConverter? converter = null);
+    object GetValue(string path, Type type);
 
     /// <summary>
     /// Sets a setting item to a new value and save the change in the storage
@@ -61,5 +61,5 @@ public interface ISettingsStorage
     /// <param name="path">A unique path that represents the location of an entry in the settings storage</param>
     /// <param name="value">The new value. The setting item is removed if value is null</param>
     /// <param name="converter">An optional converter that allows type convertion between the type accessed in code and the actual type stored.</param>
-    void SetValue<T>(string path, T value, IDataTypeConverter? converter = null) where T : notnull;
+    void SetValue<T>(string path, T value) where T : notnull;
 }

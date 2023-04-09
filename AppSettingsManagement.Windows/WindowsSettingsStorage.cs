@@ -14,18 +14,23 @@ public class WindowsSettingsStorage : ISettingsStorage
         container = ApplicationData.Current.LocalSettings;
     }
 
-    public bool ContainsKey(string path) => container.Values.ContainsKey(path);
+    /// <inheritdoc/>
+    public bool Contains(string path) => container.Values.ContainsKey(path);
 
+    /// <inheritdoc/>
     public void DeleteItem(string path)
     {
         container.Values.Remove(path);
     }
 
-    /// <inheritdoc/>
-    public T GetValue<T>(string path, IDataTypeConverter? converter = null) where T : notnull
-        => (T)GetValue(path, typeof(T), converter);
+    #region GetValue
 
-    public object GetValue(string path, Type type, IDataTypeConverter? converter = null)
+    /// <inheritdoc/>
+    public T GetValue<T>(string path) where T : notnull
+        => (T)GetValue(path, typeof(T));
+
+    /// <inheritdoc/>
+    public object GetValue(string path, Type type)
     {
         if (type.IsArray)
         {
@@ -34,35 +39,27 @@ public class WindowsSettingsStorage : ISettingsStorage
             // WinRT ApplicationDataContainer cannot store empty arrays.
             if (container.Values.ContainsKey(path))
             {
-                // Returns the stored array, which is not empty, if the key exsits.
-                object? value = container.Values[path];
-                if (value is not Array array)
-                    throw new Exception($"Item stored at path\"{path}\" is not an array");
+                // If the key exists, return the stored array, which is never empty.
+                object value = container.Values[path];
 
-                // Convert the type of array elements
-                if (converter is not null && elementType == converter.SourceType)
-                {
-                    IList list = array;
-                    for (int i = 0; i < array.Length; i++)
-                    {
-                        list[i] = converter.Convert(list[i]);
-                    }
-                }
+                // Check that the stored value is an array of the correct type.
+                if (value.GetType() != elementType)
+                    throw new Exception($"Item stored at path\"{path}\" is not an array of type {elementType}");
 
-                return array;
+                return value;
             }
-            else
+            else // If the array is empty, it is stored as null in the ApplicationDataContainer.
             {
-                // If the array is empty, it is stored as null in the ApplicationDataContainer.
+                // Return an empty array of the correct type.
                 return Array.CreateInstance(elementType, 0);
             }
         }
 
-        // Single values stored in ApplicationDataContainer
-        return GetSingleValue(path, type, converter);
+        // Access single values stored in ApplicationDataContainer
+        return GetSingleValue(path, type);
     }
 
-    private object GetSingleValue(string path, Type type, IDataTypeConverter? converter = null)
+    private object GetSingleValue(string path, Type type)
     {
         object? value = container.Values[path];
 
@@ -98,7 +95,10 @@ public class WindowsSettingsStorage : ISettingsStorage
         }
     }
 
-    public void SetValue<T>(string path, T value, IDataTypeConverter? converter = null) where T : notnull
+    #endregion
+
+    /// <inheritdoc/> // TODO: type convertion
+    public void SetValue<T>(string path, T value) where T : notnull
     {
         var type = typeof(T);
 

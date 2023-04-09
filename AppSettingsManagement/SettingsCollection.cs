@@ -29,11 +29,13 @@ public class SettingsCollection<T> : ObservableCollection<T>
                 throw new ArgumentException($"Typer converter given cannot convert from {typeof(T)}", nameof(typeConverter));
         }
 
-
         // Load initial values from storage
-        if (!_settingsStorage.ContainsKey(storagePath))
+
+        // Init the storage with an empty array if it doesn't exist
+        if (!_settingsStorage.Contains(storagePath))
             _settingsStorage.SetValue(storagePath, Array.Empty<T>());
 
+        // Get the array from the storage and apply type conversion
         T[] arrayStored = _settingsStorage.GetValue<T[]>(storagePath, typeConverter);
 
         foreach (T value in arrayStored)
@@ -47,6 +49,7 @@ public class SettingsCollection<T> : ObservableCollection<T>
     {
         // Save the entire collection as an array to the storage after converting it
         //object convertedValue = _typeConverter.ConvertFrom(this.ToArray());
+        // TODO: type conversion
         _settingsStorage.SetValue(_storagePath, this.ToArray());
     }
 }

@@ -75,18 +75,33 @@ public abstract class SettingsContainer : ISettingsContainer
 
     #region GetValue<T>
 
-    protected T? GetValue<T>(string key)
+    protected T? GetValue<T>(string key, IDataTypeConverter? converter = null)
     {
         var path = GetPathFromKey(key);
 
-        if (!Storage.ContainsKey(path))
+        if (!Storage.Contains(path))
         {
-            return default(T?);
+            return default(T?); // null
         }
 
-        var type = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
+        Type type = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
 
-        return (T)Storage.GetValue(path, type!);
+        // If a type converter is given, use it to convert the value; otherwise, return the value as the type stored
+        if (converter is not null)
+        {
+            if (converter.TargetType == type)
+            {
+                object value = Storage.GetValue(path, type);
+                if (value.GetType() == converter.TargetType)
+                    return (T?)converter.Convert(value);
+            }
+
+            throw new ArgumentException($"Typer converter given cannot convert to {type}", nameof(converter));
+        }
+        else
+        {
+            return (T)Storage.GetValue(path, type);
+        }
     }
 
     /// <summary>
@@ -101,28 +116,28 @@ public abstract class SettingsContainer : ISettingsContainer
         if (defaultValue is null)
             throw new ArgumentNullException(nameof(defaultValue));
 
-        var path = GetPathFromKey(key);
+        // Try to get the value from the storage
+        T? value = GetValue<T>(key);
 
-        if (Storage.ContainsKey(path))
+        if (value is null) // key is not found
         {
-            return Storage.GetValue<T>(path);
-        }
-        else // key is not found
-        {
-            Storage.SetValue(path, defaultValue);
+            Storage.SetValue(key, defaultValue);
             return defaultValue;
         }
+
+        return value;
     }
 
     #endregion
 
     #region SetValue<T>
+    // TODO: type convertion
 
     private void _setValue<T>(string key, T value, ref SettingChangedEventHandler? _event) where T : notnull
     {
         var path = GetPathFromKey(key);
 
-        object? currentValue = Storage.ContainsKey(path) ? Storage.GetValue<T>(path) : null;
+        object? currentValue = Storage.Contains(path) ? Storage.GetValue<T>(path) : null;
 
         var t = typeof(T);
 
