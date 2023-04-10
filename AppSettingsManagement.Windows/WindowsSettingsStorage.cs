@@ -1,13 +1,48 @@
 ﻿using Windows.Storage;
 using System.Linq;
 using System.Collections;
+using Windows.Foundation;
+using Windows.UI.ViewManagement;
 
 namespace AppSettingsManagement.Windows;
 
 // Consider rename to WinRTSettingsStorage
 public class WindowsSettingsStorage : ISettingsStorage
 {
-    readonly ApplicationDataContainer container;
+    private readonly ApplicationDataContainer container;
+    private readonly Type[] supportedTypes =
+    {
+        //https://learn.microsoft.com/en-us/windows/apps/design/app-settings/store-and-retrieve-app-data
+        // Int
+        typeof(int),
+        typeof(sbyte),
+        typeof(byte),
+        typeof(short),
+        typeof(ushort),
+        typeof(int),
+        typeof(uint),
+        typeof(long),
+        typeof(ulong),
+        // Floating point
+        typeof(float),
+        typeof(double),
+        // Char16 and string
+        typeof(char),
+        typeof(string),
+        // Boolean
+        typeof(bool),
+        // Date and time
+        typeof(DateTimeOffset),
+        typeof(TimeSpan),
+        // Other
+        typeof(Guid),
+        typeof(Point),
+        typeof(Rect),
+
+        // Enum is not supported by ApplicationDataContainer, but it can be stored as ints
+        typeof(Enum)
+    };
+
 
     public WindowsSettingsStorage()
     {
@@ -25,6 +60,9 @@ public class WindowsSettingsStorage : ISettingsStorage
 
     #region GetValue
 
+    // ApplicationDataContainer.Values is IPropertySet, which extends ICollection<KeyValuePair<string, object>>,
+    // so there is no need to use generic types.
+
     /// <inheritdoc/>
     public T GetValue<T>(string path) where T : notnull
         => (T)GetValue(path, typeof(T));
@@ -35,6 +73,9 @@ public class WindowsSettingsStorage : ISettingsStorage
         if (type.IsArray)
         {
             Type elementType = type.GetElementType()!;
+
+            if (!supportedTypes.Contains(elementType))
+                throw new InvalidOperationException($"Type {elementType} is not supported by {nameof(WindowsSettingsStorage)}");
 
             // WinRT ApplicationDataContainer cannot store empty arrays.
             if (container.Values.ContainsKey(path))
@@ -56,53 +97,38 @@ public class WindowsSettingsStorage : ISettingsStorage
         }
 
         // Access single values stored in ApplicationDataContainer
-        return GetSingleValue(path, type);
-    }
 
-    private object GetSingleValue(string path, Type type)
-    {
-        object? value = container.Values[path];
+        // Check the type requested
+        if (!supportedTypes.Contains(type))
+            throw new InvalidOperationException($"Type {type} is not supported by {nameof(WindowsSettingsStorage)}");
 
         if (!container.Values.ContainsKey(path))
             throw new KeyNotFoundException($"Key {path} not found.");
 
-        
-        if (type == typeof(sbyte) ||
-            type == typeof(byte) ||
-            type == typeof(short) ||
-            type == typeof(ushort) ||
-            type == typeof(int) ||
-            type == typeof(uint) ||
-            type == typeof(long) ||
-            type == typeof(ulong) ||
-            
-            type == typeof(float) ||
-            type == typeof(double) ||
-            type == typeof(decimal) ||
-            
-            type == typeof(char) ||
-            type == typeof(string) || type == typeof(string[]) ||
-
-
-            type.IsEnum // Enums are stored as integral types, which can be explicitly cast to enums
-            )
-        {
-            return value;
-        }
-        else
-        {
-            
-            throw new NotSupportedException($"Data type {type} not supported.");
-        }
+        return container.Values[path];
     }
 
     #endregion
 
-    /// <inheritdoc/> // TODO: type convertion
+    #region SetValue
+
+    /// <inheritdoc/>
     public void SetValue<T>(string path, T value) where T : notnull
     {
-        var type = typeof(T);
+        if (value is null)
+            throw new ArgumentNullException(nameof(value));
 
+        // ApplicationDataContainer.Values is IPropertySet, which extends ICollection<KeyValuePair<string, object>>,
+        // so there is no need to use generic types.
+        SetValue(path, value);
+    }
+
+    public void SetValue(string path, object value)
+    {
+        if (value is null)
+            throw new ArgumentNullException(nameof(value));
+
+        Type type = value.GetType();
         if (type.IsEnum)
         {
             // Store enums as their integral types
@@ -124,4 +150,6 @@ public class WindowsSettingsStorage : ISettingsStorage
             container.Values[path] = value;
         }
     }
+
+    #endregion
 }
