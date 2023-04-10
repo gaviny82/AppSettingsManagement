@@ -36,10 +36,29 @@ public class SettingsCollection<T> : ObservableCollection<T>
             _settingsStorage.SetValue(storagePath, Array.Empty<T>());
 
         // Get the array from the storage and apply type conversion
-        T[] arrayStored = _settingsStorage.GetValue<T[]>(storagePath, typeConverter);
+        if (typeConverter is not null)
+        {
+            Array storedArray = (Array)_settingsStorage.GetValue(storagePath, typeConverter.SourceType);
+            
+            // Throws if the type converter cannot convert to T
+            if (typeConverter.TargetType != typeof(T))
+                throw new ArgumentException($"Typer converter given cannot convert to {typeof(T)}", nameof(typeConverter));
 
-        foreach (T value in arrayStored)
-            Add(value);
+            // Convert each element of the array and add it to the collection
+            IEnumerator enumerator = storedArray.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                T convertedValue = (T)typeConverter.ConvertFrom(enumerator.Current)!; // Type conversion is guaranteed to succeed
+                Add(convertedValue);
+            }
+        }
+        else // No type conversion needed
+        {
+            T[] storedArray = _settingsStorage.GetValue<T[]>(storagePath);
+
+            foreach (T value in storedArray)
+                Add(value);
+        }
 
         // Register CollectionChanged event after initialization
         CollectionChanged += SettingsCollection_CollectionChanged;

@@ -84,13 +84,14 @@ public class WindowsSettingsStorage : ISettingsStorage
             type == typeof(string) || type == typeof(string[]) ||
 
 
-            type.IsEnum // Enums are stored as integral types, which can be cast to enums automatically
+            type.IsEnum // Enums are stored as integral types, which can be explicitly cast to enums
             )
         {
             return value;
         }
         else
         {
+            
             throw new NotSupportedException($"Data type {type} not supported.");
         }
     }
@@ -118,6 +119,7 @@ public class WindowsSettingsStorage : ISettingsStorage
         }
         else
         {
+            // TODO: check unsupported types
             // Single values of supported types
             container.Values[path] = value;
         }

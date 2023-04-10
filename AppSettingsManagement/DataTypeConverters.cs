@@ -12,7 +12,13 @@ namespace AppSettingsManagement;
 /// </summary>
 public interface IDataTypeConverter
 {
+    /// <summary>
+    /// Type stored in the storage
+    /// </summary>
     Type SourceType { get; }
+    /// <summary>
+    /// Type used in the application
+    /// </summary>
     Type TargetType { get; }
 
     object? Convert(object? source);

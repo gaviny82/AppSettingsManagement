@@ -23,7 +23,6 @@ public interface ISettingsContainer
 
 /// <summary>
 /// Allows settings to be stored on a device. Class implementing this interface should load the settings when instantiated.
-/// 
 /// </summary>
 /// <remarks>
 /// The types accepted by the storage provider depends on the implementation.<br/>
@@ -34,9 +33,14 @@ public interface ISettingsStorage
     /// <summary>
     /// Delete a setting item in the storage if the key exists .
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="path">A unique path that represents the location of an entry in the settings storage</param>
     void DeleteItem(string path);
 
+    /// <summary>
+    /// Checks if the storage contains a setting item with the specified path
+    /// </summary>
+    /// <param name="path">A unique path that represents the location of an entry in the settings storage</param>
+    /// <returns></returns>
     bool Contains(string path);
 
     /// <summary>
@@ -52,6 +56,12 @@ public interface ISettingsStorage
     /// <br/> into T when the item is accessed, and converting T into the type used in storage.</remarks>
     T GetValue<T>(string path) where T : notnull;
 
+    /// <summary>
+    /// Obtains the value of a setting item from the storage
+    /// </summary>
+    /// <param name="path">A unique path that locates the item in the storage</param>
+    /// <param name="type">Type of the value expected<br/>This may be used when dealing with special types such as arrays.</param>
+    /// <returns></returns>
     object GetValue(string path, Type type);
 
     /// <summary>
