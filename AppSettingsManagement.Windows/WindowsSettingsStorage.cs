@@ -137,16 +137,22 @@ public class WindowsSettingsStorage : ISettingsStorage
         }
         else if (type.IsArray)
         {
+            // Check if the array element type is supported
+            if (!supportedTypes.Contains(type.GetElementType()))
+                throw new InvalidOperationException($"Type {type} is not supported by {nameof(WindowsSettingsStorage)}");
+
             // If array is empty, remove the item, because empty array cannot be stored in ApplicationDataContainer.
             if (value is Array { Length: 0 })
                 container.Values[path] = null;
             else if (value is Array)
                 container.Values[path] = value;
         }
-        else
+        else // Other single values
         {
-            // TODO: check unsupported types
-            // Single values of supported types
+            // Check if the type of `value` is supported
+            if (!supportedTypes.Contains(type))
+                throw new InvalidOperationException($"Type {type} is not supported by {nameof(WindowsSettingsStorage)}");
+
             container.Values[path] = value;
         }
     }

@@ -66,9 +66,19 @@ public class SettingsCollection<T> : ObservableCollection<T>
 
     private void SettingsCollection_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        // Save the entire collection as an array to the storage after converting it
-        //object convertedValue = _typeConverter.ConvertFrom(this.ToArray());
-        // TODO: type conversion
-        _settingsStorage.SetValue(_storagePath, this.ToArray());
+        // Save the entire list as an array in the storage
+        if(_typeConverter is not null) // Convert each element using the type converter
+        {
+            if (typeof(T) != _typeConverter.TargetType)
+                throw new InvalidCastException($"Type converter given does not support convertion from {typeof(T)}");
+            
+            object?[] convertedArray = this.Select(item => _typeConverter.ConvertFrom(item)).ToArray();
+            _settingsStorage.SetValue(_storagePath, convertedArray);
+        }
+        else // No type conversion needed
+        {
+            T[] array = this.ToArray();
+            _settingsStorage.SetValue<T[]>(_storagePath, array);
+        }
     }
 }

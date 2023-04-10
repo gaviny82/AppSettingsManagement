@@ -131,24 +131,39 @@ public abstract class SettingsContainer : ISettingsContainer
     #endregion
 
     #region SetValue<T>
-    // TODO: type convertion
 
-    private void _setValue<T>(string key, T value, ref SettingChangedEventHandler? _event) where T : notnull
+    private void _setValue<T>(string key,
+                              T value,
+                              ref SettingChangedEventHandler? _event,
+                              IDataTypeConverter? converter = null) where T : notnull
     {
         var path = GetPathFromKey(key);
-
         object? currentValue = Storage.Contains(path) ? Storage.GetValue<T>(path) : null;
 
-        var t = typeof(T);
+        if (value.Equals(currentValue))
+            return;
 
-        // Only invoke events when the new value is different
-        if (!value.Equals(currentValue))
+        // Only set the value when the new value is different
+        if (converter is not null) // Convert value from T using the converter
         {
-            Storage.SetValue(path, (T)value);
+            if (typeof(T) != converter.TargetType)
+                throw new ArgumentException($"Type converter given cannot convert from {typeof(T)}", nameof(converter));
 
-            _event?.Invoke(this, new SettingChangedEventArgs(path, value));
-            SettingsChanged?.Invoke(this, new SettingChangedEventArgs(path, value));
+            object? convertedValue = converter.Convert(value);
+
+            if(convertedValue is null)
+                Storage.DeleteItem(path);
+            else
+                Storage.SetValue(path, convertedValue);
         }
+        else // No converter is given; store the value as type T.
+        {
+            Storage.SetValue<T>(path, value);
+        }
+
+        // Notify a setting item has been changed
+        _event?.Invoke(this, new SettingChangedEventArgs(path, value));
+        SettingsChanged?.Invoke(this, new SettingChangedEventArgs(path, value));
     }
 
     /// <summary>
@@ -158,14 +173,17 @@ public abstract class SettingsContainer : ISettingsContainer
     /// <param name="key"></param>
     /// <param name="value"></param>
     /// <param name="_event"></param>
-    protected void SetValue<T>(string key, T? value, ref SettingChangedEventHandler? _event) where T : struct
+    protected void SetValue<T>(string key,
+                               T? value,
+                               ref SettingChangedEventHandler? _event,
+                               IDataTypeConverter? converter = null) where T : struct
     {
         if (value is null)
         {
             Storage.DeleteItem(key);
             return;
         }
-        _setValue<T>(key, (T)value, ref _event);
+        _setValue<T>(key, (T)value, ref _event, converter);
     }
 
     /// <summary>
@@ -175,15 +193,63 @@ public abstract class SettingsContainer : ISettingsContainer
     /// <param name="key"></param>
     /// <param name="value"></param>
     /// <param name="_event"></param>
-    protected void SetValue<T>(string key, T? value, ref SettingChangedEventHandler? _event) where T : class
+    protected void SetValue<T>(string key,
+                               T? value,
+                               ref SettingChangedEventHandler? _event,
+                               IDataTypeConverter? converter = null) where T : class
     {
         if (value is null)
         {
             Storage.DeleteItem(key);
             return;
         }
-        _setValue<T>(key, value, ref _event);
+        _setValue<T>(key, value, ref _event, converter);
     }
+
+    //protected void SetValue(string key,
+    //                        object value,
+    //                        ref SettingChangedEventHandler? _event,
+    //                        IDataTypeConverter? converter = null)
+    //{
+    //    string path = GetPathFromKey(key);
+
+    //    // Remove the setting item if set to null
+    //    if (value is null)
+    //    {
+    //        Storage.DeleteItem(path);
+    //        return;
+    //    }
+
+
+    //    // If a type converter is given, store the converted value
+    //    if (converter is not null)
+    //    {
+    //        object? currentValue = Storage.Contains(path) ? Storage.GetValue(path, converter.TargetType) : null;
+
+    //        if (converter.TargetType != value.GetType())
+    //            throw new ArgumentException($"Typer converter given cannot convert to {value.GetType()}", nameof(converter));
+
+    //        // Only invoke events when the new value is different
+    //        if (!value.Equals(currentValue))
+    //        {
+    //            Storage.SetValue(path, converter.Convert(value));
+    //            _event?.Invoke(this, new SettingChangedEventArgs(path, value));
+    //            SettingsChanged?.Invoke(this, new SettingChangedEventArgs(path, value));
+    //        }
+    //    }
+    //    else // No type converter specified, store the value as is
+    //    {
+    //        object? currentValue = Storage.Contains(path) ? Storage.GetValue(path, value.GetType()) : null;
+
+    //        // Only invoke events when the new value is different
+    //        if (!value.Equals(currentValue))
+    //        {
+    //            Storage.SetValue(path, value);
+    //            _event?.Invoke(this, new SettingChangedEventArgs(path, value));
+    //            SettingsChanged?.Invoke(this, new SettingChangedEventArgs(path, value));
+    //        }
+    //    }   
+    //}
 
     #endregion SetValue<T>
 }

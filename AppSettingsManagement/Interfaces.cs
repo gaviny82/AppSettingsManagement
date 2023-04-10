@@ -65,11 +65,18 @@ public interface ISettingsStorage
     object GetValue(string path, Type type);
 
     /// <summary>
-    /// Sets a setting item to a new value and save the change in the storage
+    /// Sets a setting item to a new value in the storage
     /// </summary>
     /// <typeparam name="T">Type of the value</typeparam>
     /// <param name="path">A unique path that represents the location of an entry in the settings storage</param>
-    /// <param name="value">The new value. The setting item is removed if value is null</param>
-    /// <param name="converter">An optional converter that allows type convertion between the type accessed in code and the actual type stored.</param>
+    /// <param name="value">The new value</param>
     void SetValue<T>(string path, T value) where T : notnull;
+
+    /// <summary>
+    /// Sets a setting item to a new value in the storage
+    /// </summary>
+    /// <param name="path">A unique path that represents the location of an entry in the settings storage</param>
+    /// <param name="value">The new value</param>
+    /// <returns></returns>
+    void SetValue(string path, object value);
 }
