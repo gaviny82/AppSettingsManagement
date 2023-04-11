@@ -74,8 +74,7 @@ namespace AppSettingsManagementSample
         private void AddItemToList_Click(object sender, RoutedEventArgs e)
         {
             SettingsCollection<int> intList = SettingsManager.IntList;
-            int element = intList.Count > 0 ? intList[0] : 0;
-            intList.Add(element + 100);
+            intList.Add(intList.LastOrDefault() + 100);
         }
 
         private void GetItem_Click(object sender, RoutedEventArgs e)

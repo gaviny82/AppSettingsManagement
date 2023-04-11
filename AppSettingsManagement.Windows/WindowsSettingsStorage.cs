@@ -93,7 +93,7 @@ public class WindowsSettingsStorage : ISettingsStorage
                 object value = container.Values[path];
 
                 // Check that the stored value is an array of the correct type.
-                if (value.GetType() != elementType)
+                if (value.GetType().GetElementType() != elementType)
                     throw new Exception($"Item stored at path\"{path}\" is not an array of type {elementType}");
 
                 return value;
