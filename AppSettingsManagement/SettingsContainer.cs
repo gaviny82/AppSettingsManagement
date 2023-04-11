@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -111,17 +112,29 @@ public abstract class SettingsContainer : ISettingsContainer
     /// <param name="key"></param>
     /// <param name="defaultValue">Cannot be null; the setting item is removed if set to null.</param>
     /// <returns></returns>
-    protected T GetValue<T>(string key, T defaultValue) where T : notnull
+    protected T GetValue<T>(string key, T defaultValue, IDataTypeConverter? converter = null) where T : notnull
     {
         if (defaultValue is null)
             throw new ArgumentNullException(nameof(defaultValue));
 
-        // Try to get the value from the storage
-        T? value = GetValue<T>(key);
+        if (converter is not null && converter.TargetType != typeof(T))
+            throw new ArgumentException($"Type converter given cannot convert to {typeof(T)}", nameof(converter));
 
-        if (value is null) // key is not found
+        var path = GetPathFromKey(key);
+
+        object defaultValueConverted = converter?.ConvertFrom(defaultValue) ?? defaultValue;
+
+        if (!Storage.Contains(path)) // key is not found
         {
-            Storage.SetValue(key, defaultValue);
+            Storage.SetValue(key, defaultValueConverted, defaultValueConverted.GetType());
+            return defaultValue;
+        }
+
+        // Try to get the value from the storage
+        T? value = GetValue<T>(key, converter);
+        if (value is null) 
+        {
+            Storage.SetValue(key, defaultValueConverted, defaultValueConverted.GetType());
             return defaultValue;
         }
 

@@ -77,6 +77,7 @@ public interface ISettingsStorage
     /// </summary>
     /// <param name="path">A unique path that represents the location of an entry in the settings storage</param>
     /// <param name="value">The new value</param>
+    /// <param name="type">Type of the value</param>
     /// <returns></returns>
-    void SetValue(string path, object value);
+    void SetValue(string path, object value, Type type);
 }

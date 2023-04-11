@@ -7,6 +7,7 @@ using Windows.UI.ViewManagement;
 namespace AppSettingsManagement.Windows;
 
 // Consider rename to WinRTSettingsStorage
+// TODO: implement sub-containers
 public class WindowsSettingsStorage : ISettingsStorage
 {
     private readonly ApplicationDataContainer container;
@@ -120,15 +121,14 @@ public class WindowsSettingsStorage : ISettingsStorage
 
         // ApplicationDataContainer.Values is IPropertySet, which extends ICollection<KeyValuePair<string, object>>,
         // so there is no need to use generic types.
-        SetValue(path, value);
+        SetValue(path, value, value.GetType());
     }
 
-    public void SetValue(string path, object value)
+    public void SetValue(string path, object value, Type type)
     {
         if (value is null)
             throw new ArgumentNullException(nameof(value));
 
-        Type type = value.GetType();
         if (type.IsEnum)
         {
             // Store enums as their integral types
