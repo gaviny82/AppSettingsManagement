@@ -17,9 +17,48 @@
         Orientation="Vertical"
         Spacing="4">
 
-        <Button Content="Reset all settings" Click="Reset_Click"/>
-        <Button Content="Add str item" Click="AddStr_Click"/>
-        <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Account Information" />
+        <TextBlock
+            FontSize="20"
+            Style="{ThemeResource BodyStrongTextBlockStyle}"
+            Text="Test programmatic operations" />
+
+        <StackPanel Orientation="Horizontal" Spacing="5">
+            <Button Click="Delete_Click" Content="Delete all settings" />
+            <Button Content="Reset all settings" IsEnabled="False" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="5">
+            <Button Click="SetStrings_Click" Content="Set strings" />
+            <Button Click="SetInts_Click" Content="Set ints" />
+            <Button Click="SetEnums_Click" Content="Set enums" />
+            <Button Click="AddItemToList_Click" Content="Set list" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="5">
+            <Button
+                Click="GetItem_Click"
+                Content="Get strings"
+                Tag="string" />
+            <Button
+                Click="GetItem_Click"
+                Content="Get ints"
+                Tag="int" />
+            <Button
+                Click="GetItem_Click"
+                Content="Get enums"
+                Tag="enum" />
+            <Button
+                Click="GetItem_Click"
+                Content="Get list"
+                Tag="list" />
+        </StackPanel>
+
+        <TextBlock Name="TestOutput" Text="Test output" />
+
+        <TextBlock
+            FontSize="20"
+            Style="{ThemeResource BodyStrongTextBlockStyle}"
+            Text="Test container" />
         <TextBox
             PlaceholderText="Username"
             Text="{Binding Username, Mode=TwoWay}"

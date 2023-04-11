@@ -18,12 +18,13 @@ internal partial class SettingsService
     public AccountInformation ActiveAccount { get; private set; } = null!;
 
     // Arrays
-    public SettingsCollection<string> Names { get; } = new(Provider, "Names");
+    public SettingsCollection<int> IntList { get; private set; } = null!;
 
 
     protected override void InitializeContainers()
     {
-        ActiveAccount = new(Storage, nameof(ActiveAccount), this);
+        ActiveAccount = new AccountInformation(Storage, nameof(ActiveAccount), this);
+        IntList = new SettingsCollection<int>(Storage, "IntList");
     }
 
 }
@@ -34,16 +35,23 @@ internal partial class SettingsService : SettingsContainer
 
     #region Settings
 
-    [SettingItem(typeof(string), "UsernameWithoutDefault")] // Used to test properties without default
+    // Test strings
+    [SettingItem(typeof(string), "TestString")]
+    [SettingItem(typeof(string), "TestStringWithDefault", Default = "DEFAULT STRING")]
 
-    [SettingItem(typeof(int), "NumberWithoutDefault")] // Used to test properties without default
-    [SettingItem(typeof(int), "Number", Default = 100)]
+    // Test ints
+    [SettingItem(typeof(int), "TestInt")] // Used to test properties without default
+    [SettingItem(typeof(int), "TestIntWithDefault", Default = 100)]
 
+    // Test enums
     [SettingItem(typeof(Theme), "Theme", Default = Theme.Default)]
-    
-    [SettingsContainer(typeof(AccountInformation), nameof(ActiveAccount))] // Composite values
+    [SettingItem(typeof(TestEnum), "TestEnum")]
 
-    [SettingsCollection(typeof(string), "Names")]
+    // Test lists
+    [SettingsCollection(typeof(int), "IntList")]
+
+    // TODO: Test containers
+    [SettingsContainer(typeof(AccountInformation), nameof(ActiveAccount))] // Composite values
 
     #endregion
 
@@ -58,11 +66,13 @@ public enum Theme
     Default
 }
 
-
-internal partial class AccountInformation
+enum TestEnum : byte
 {
-
+    A,
+    B,
+    C
 }
+
 
 internal partial class AccountInformation : SettingsContainer
 {

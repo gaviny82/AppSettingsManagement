@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using AppSettingsManagement;
 using AppSettingsManagementSample.Services;
 using AppSettingsManagementSample.ViewModels;
 using Microsoft.UI.Xaml;
@@ -34,28 +35,69 @@ namespace AppSettingsManagementSample
         public SettingsService SettingsManager { get; } = new();
         ApplicationDataContainer LocalSettings = ApplicationData.Current.LocalSettings;
 
-        void ResetSettings()
+
+        public MainWindow()
+        {
+            this.InitializeComponent();
+
+            // TODO: test view model bindings
+            //panel.DataContext = new SettingsViewModel(SettingsManager);
+        }
+
+        private void Delete_Click(object sender, RoutedEventArgs e)
+            => DeleteAllSettings();
+        void DeleteAllSettings()
         {
             LocalSettings.Values.Clear();
             foreach (var c in LocalSettings.Containers.Keys)
                 LocalSettings.DeleteContainer(c);
         }
 
-        public MainWindow()
+        private void SetStrings_Click(object sender, RoutedEventArgs e)
         {
-            this.InitializeComponent();
-
-            panel.DataContext = new SettingsViewModel(SettingsManager);
+            SettingsManager.TestString = "Test string";
+            SettingsManager.TestStringWithDefault = "Test string with default";
         }
 
-        private void Reset_Click(object sender, RoutedEventArgs e)
+        private void SetInts_Click(object sender, RoutedEventArgs e)
         {
-            ResetSettings();
+            SettingsManager.TestInt = 100;
+            SettingsManager.TestIntWithDefault = 200;
+        }
+
+        private void SetEnums_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsManager.Theme = Theme.Dark;
+            SettingsManager.TestEnum = TestEnum.A;
+        }
+
+        private void AddItemToList_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsCollection<int> intList = SettingsManager.IntList;
+            int element = intList.Count > 0 ? intList[0] : 0;
+            intList.Add(element + 100);
+        }
+
+        private void GetItem_Click(object sender, RoutedEventArgs e)
+        {
+            Button btn = (Button)sender;
+            string tag = (string)btn.Tag;
+
+            string value = tag switch
+            {
+                "string" => $"TestString: {SettingsManager.TestString}; TestStringWithDefault: {SettingsManager.TestStringWithDefault}",
+                "int" => $"TestInt: {SettingsManager.TestInt}; TestIntWithDefault: {SettingsManager.TestIntWithDefault}",
+                "enum" => $"Theme: {SettingsManager.Theme}; TestEnum: {SettingsManager.TestEnum}",
+                "list" => $"IntList: {string.Join(", ", SettingsManager.IntList)}",
+                _ => ""
+            };
+
+            TestOutput.Text = value;
         }
 
         private void AddStr_Click(object sender, RoutedEventArgs e)
         {
-            SettingsManager.Names.Add("New item");
+            //SettingsManager.Names.Add("New item");
         }
     }
 
