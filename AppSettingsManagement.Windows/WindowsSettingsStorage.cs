@@ -44,6 +44,14 @@ public class WindowsSettingsStorage : ISettingsStorage
         typeof(Enum)
     };
 
+    private bool IsTypeSupported(Type? type)
+    {
+        if (type is null)
+            return false;
+
+        return supportedTypes.Contains(type) || type.IsEnum;
+    }
+
 
     public WindowsSettingsStorage()
     {
@@ -75,7 +83,7 @@ public class WindowsSettingsStorage : ISettingsStorage
         {
             Type elementType = type.GetElementType()!;
 
-            if (!supportedTypes.Contains(elementType))
+            if (!IsTypeSupported(elementType))
                 throw new InvalidOperationException($"Type {elementType} is not supported by {nameof(WindowsSettingsStorage)}");
 
             // WinRT ApplicationDataContainer cannot store empty arrays.
@@ -100,7 +108,7 @@ public class WindowsSettingsStorage : ISettingsStorage
         // Access single values stored in ApplicationDataContainer
 
         // Check the type requested
-        if (!supportedTypes.Contains(type))
+        if (!IsTypeSupported(type))
             throw new InvalidOperationException($"Type {type} is not supported by {nameof(WindowsSettingsStorage)}");
 
         if (!container.Values.ContainsKey(path))
@@ -138,7 +146,7 @@ public class WindowsSettingsStorage : ISettingsStorage
         else if (type.IsArray)
         {
             // Check if the array element type is supported
-            if (!supportedTypes.Contains(type.GetElementType()))
+            if (!IsTypeSupported(type.GetElementType()))
                 throw new InvalidOperationException($"Type {type} is not supported by {nameof(WindowsSettingsStorage)}");
 
             // If array is empty, remove the item, because empty array cannot be stored in ApplicationDataContainer.
@@ -150,7 +158,7 @@ public class WindowsSettingsStorage : ISettingsStorage
         else // Other single values
         {
             // Check if the type of `value` is supported
-            if (!supportedTypes.Contains(type))
+            if (!IsTypeSupported(type))
                 throw new InvalidOperationException($"Type {type} is not supported by {nameof(WindowsSettingsStorage)}");
 
             container.Values[path] = value;
