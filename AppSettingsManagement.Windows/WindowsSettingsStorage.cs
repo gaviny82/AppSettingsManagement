@@ -7,7 +7,6 @@ using Windows.UI.ViewManagement;
 namespace AppSettingsManagement.Windows;
 
 // Consider rename to WinRTSettingsStorage
-// TODO: implement sub-containers
 public class WindowsSettingsStorage : ISettingsStorage
 {
     private readonly ApplicationDataContainer _container;

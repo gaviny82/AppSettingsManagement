@@ -51,6 +51,7 @@ namespace AppSettingsManagementSample
             LocalSettings.Values.Clear();
             foreach (var c in LocalSettings.Containers.Keys)
                 LocalSettings.DeleteContainer(c);
+            SettingsManager.IntList.Clear();
         }
 
         private void SetStrings_Click(object sender, RoutedEventArgs e)
@@ -93,6 +94,8 @@ namespace AppSettingsManagementSample
             testEnumWithDefault.SelectedIndex = (int)SettingsManager.Theme;
             testEnum.SelectedIndex = SettingsManager.TestEnum == null ? -1 : (int)SettingsManager.TestEnum;
             testListContent.Text = string.Join(", ", SettingsManager.IntList);
+            username.Text = SettingsManager.ActiveAccount.Username;
+            password.Text = SettingsManager.ActiveAccount.Password;
         }
 
 
@@ -100,11 +103,14 @@ namespace AppSettingsManagementSample
         {
             SettingsManager.TestString = testString.Text;
             SettingsManager.TestStringWithDefault = testStringWithDefault.Text;
-            SettingsManager.TestInt = int.Parse(testInt.Text);
+            int? i = int.TryParse(testInt.Text, out int test_int) ? test_int : null;
+            SettingsManager.TestInt = i;
             SettingsManager.TestIntWithDefault = int.Parse(testIntWithDefault.Text);
-            SettingsManager.TestEnum = (TestEnum)testEnumWithDefault.SelectedIndex;
-            SettingsManager.Theme = (Theme)testEnum.SelectedIndex;
+            SettingsManager.Theme = (Theme)testEnumWithDefault.SelectedIndex;
+            SettingsManager.TestEnum = (testEnum.SelectedIndex == -1 ? null : (TestEnum)testEnum.SelectedIndex);
             SettingsManager.IntList.Add(Random.Shared.Next());
+            SettingsManager.ActiveAccount.Username = username.Text;
+            SettingsManager.ActiveAccount.Password = password.Text;
         }
 
         private void AddStr_Click(object sender, RoutedEventArgs e)

@@ -126,7 +126,7 @@ public abstract class SettingsContainer : ISettingsContainer
 
         if (!Storage.Contains(path)) // key is not found
         {
-            Storage.SetValue(key, defaultValueConverted, defaultValueConverted.GetType());
+            Storage.SetValue(path, defaultValueConverted, defaultValueConverted.GetType());
             return defaultValue;
         }
 
@@ -134,7 +134,7 @@ public abstract class SettingsContainer : ISettingsContainer
         T? value = GetValue<T>(key, converter);
         if (value is null) 
         {
-            Storage.SetValue(key, defaultValueConverted, defaultValueConverted.GetType());
+            Storage.SetValue(path, defaultValueConverted, defaultValueConverted.GetType());
             return defaultValue;
         }
 
