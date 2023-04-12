@@ -32,28 +32,31 @@
             <Button Click="SetInts_Click" Content="Set ints" />
             <Button Click="SetEnums_Click" Content="Set enums" />
             <Button Click="AddItemToList_Click" Content="Set list" />
+            <Button Click="SetContainer_Click" Content="Set container" />
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Spacing="5">
-            <Button
-                Click="GetItem_Click"
-                Content="Get strings"
-                Tag="string" />
-            <Button
-                Click="GetItem_Click"
-                Content="Get ints"
-                Tag="int" />
-            <Button
-                Click="GetItem_Click"
-                Content="Get enums"
-                Tag="enum" />
-            <Button
-                Click="GetItem_Click"
-                Content="Get list"
-                Tag="list" />
+            <Button Click="GetAllValues_Click" Content="Get all values" />
+            <Button Click="SetAllValues_Click" Content="Set all values" />
         </StackPanel>
 
-        <TextBlock Name="TestOutput" Text="Test output" />
+        <StackPanel Spacing="5">
+            <TextBox Name="testString" ToolTipService.ToolTip="TestString" />
+            <TextBox Name="testStringWithDefault" ToolTipService.ToolTip="TestStringWithDefault" />
+            <NumberBox Name="testInt" ToolTipService.ToolTip="TestInt" />
+            <NumberBox Name="testIntWithDefault" ToolTipService.ToolTip="TestIntWithDefault" />
+            <ComboBox Name="testEnumWithDefault" ToolTipService.ToolTip="TestEnumWithDefault">
+                <ComboBoxItem Content="Bright" />
+                <ComboBoxItem Content="Dark" />
+                <ComboBoxItem Content="Default" />
+            </ComboBox>
+            <ComboBox Name="testEnum" ToolTipService.ToolTip="TestEnum">
+                <ComboBoxItem Content="A" />
+                <ComboBoxItem Content="B" />
+                <ComboBoxItem Content="C" />
+            </ComboBox>
+            <TextBlock Name="testListContent" />
+        </StackPanel>
 
         <TextBlock
             FontSize="20"

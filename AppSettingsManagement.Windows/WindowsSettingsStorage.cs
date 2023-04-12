@@ -140,6 +140,14 @@ public class WindowsSettingsStorage : ISettingsStorage
         if (container is null || !container.Values.ContainsKey(key))
             throw new KeyNotFoundException($"Path {path} not found.");
 
+        // Convert enum integral values to their enum types
+        if (type.IsEnum)
+        {
+            // Retrieve enums as their integral types
+            var integralValue = container.Values[key];
+            return Enum.ToObject(type, integralValue);
+        }
+
         return container.Values[key];
     }
 

@@ -77,21 +77,34 @@ namespace AppSettingsManagementSample
             intList.Add(intList.LastOrDefault() + 100);
         }
 
-        private void GetItem_Click(object sender, RoutedEventArgs e)
+        private void SetContainer_Click(object sender, RoutedEventArgs e)
         {
-            Button btn = (Button)sender;
-            string tag = (string)btn.Tag;
+            AccountInformation accountInfo = SettingsManager.ActiveAccount;
+            accountInfo.Username = "TestUser";
+            accountInfo.Password = "TestPassword";
+        }
 
-            string value = tag switch
-            {
-                "string" => $"TestString: {SettingsManager.TestString}; TestStringWithDefault: {SettingsManager.TestStringWithDefault}",
-                "int" => $"TestInt: {SettingsManager.TestInt}; TestIntWithDefault: {SettingsManager.TestIntWithDefault}",
-                "enum" => $"Theme: {SettingsManager.Theme}; TestEnum: {SettingsManager.TestEnum}",
-                "list" => $"IntList: {string.Join(", ", SettingsManager.IntList)}",
-                _ => ""
-            };
+        private void GetAllValues_Click(object sender, RoutedEventArgs e)
+        {
+            testString.Text = SettingsManager.TestString;
+            testStringWithDefault.Text = SettingsManager.TestStringWithDefault;
+            testInt.Text = SettingsManager.TestInt.ToString();
+            testIntWithDefault.Text = SettingsManager.TestIntWithDefault.ToString();
+            testEnumWithDefault.SelectedIndex = (int)SettingsManager.Theme;
+            testEnum.SelectedIndex = SettingsManager.TestEnum == null ? -1 : (int)SettingsManager.TestEnum;
+            testListContent.Text = string.Join(", ", SettingsManager.IntList);
+        }
 
-            TestOutput.Text = value;
+
+        private void SetAllValues_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsManager.TestString = testString.Text;
+            SettingsManager.TestStringWithDefault = testStringWithDefault.Text;
+            SettingsManager.TestInt = int.Parse(testInt.Text);
+            SettingsManager.TestIntWithDefault = int.Parse(testIntWithDefault.Text);
+            SettingsManager.TestEnum = (TestEnum)testEnumWithDefault.SelectedIndex;
+            SettingsManager.Theme = (Theme)testEnum.SelectedIndex;
+            SettingsManager.IntList.Add(Random.Shared.Next());
         }
 
         private void AddStr_Click(object sender, RoutedEventArgs e)
