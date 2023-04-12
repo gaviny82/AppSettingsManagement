@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace AppSettingsManagement;
 
-// TODO: test if T can be nullable in ApplicationDataContainer
-public class SettingsCollection<T> : ObservableCollection<T>
+// Cannot store null values in a collection
+public class SettingsCollection<T> : ObservableCollection<T> where T : notnull
 {
     private readonly ISettingsStorage _settingsStorage;
     private readonly IDataTypeConverter? _typeConverter;
