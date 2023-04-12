@@ -53,6 +53,8 @@ internal partial class SettingsService : SettingsContainer
     // TODO: Test containers
     [SettingsContainer(typeof(AccountInformation), nameof(ActiveAccount))] // Composite values
 
+    // TODO: Test converters
+
     #endregion
 
     public SettingsService() : base(Provider) { }
