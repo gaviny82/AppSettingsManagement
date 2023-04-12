@@ -10,7 +10,7 @@ namespace AppSettingsManagement.Windows;
 // TODO: implement sub-containers
 public class WindowsSettingsStorage : ISettingsStorage
 {
-    private readonly ApplicationDataContainer container;
+    private readonly ApplicationDataContainer _container;
     private readonly Type[] supportedTypes =
     {
         //https://learn.microsoft.com/en-us/windows/apps/design/app-settings/store-and-retrieve-app-data
@@ -44,6 +44,12 @@ public class WindowsSettingsStorage : ISettingsStorage
         typeof(Enum)
     };
 
+
+    public WindowsSettingsStorage()
+    {
+        _container = ApplicationData.Current.LocalSettings;
+    }
+
     private bool IsTypeSupported(Type? type)
     {
         if (type is null)
@@ -52,19 +58,37 @@ public class WindowsSettingsStorage : ISettingsStorage
         return supportedTypes.Contains(type) || type.IsEnum;
     }
 
-
-    public WindowsSettingsStorage()
+    /// <summary>
+    /// Checks if a container exists at the given path, and if so, returns the container and the key.
+    /// </summary>
+    /// <param name="path">Path of a setting item to be checked</param>
+    /// <returns>The container and the key</returns>
+    private (ApplicationDataContainer?, string) GetContainerAndKey(string path)
     {
-        container = ApplicationData.Current.LocalSettings;
+        var parts = path.Split('/');
+        var container = _container;
+        for (int i = 0; i < parts.Length - 1; i++)
+        {
+            var part = parts[i];
+            if (!container.Containers.ContainsKey(part))
+                return (null, "");
+            container = container.Containers[part];
+        }
+        return (container, parts[^1]);
     }
 
     /// <inheritdoc/>
-    public bool Contains(string path) => container.Values.ContainsKey(path);
+    public bool Contains(string path)
+    {
+        var (container, key) = GetContainerAndKey(path);
+        return container?.Values.ContainsKey(key) ?? false;
+    }
 
     /// <inheritdoc/>
     public void DeleteItem(string path)
     {
-        container.Values.Remove(path);
+        var (container, key) = GetContainerAndKey(path);
+        container?.Values.Remove(key);
     }
 
     #region GetValue
@@ -79,6 +103,8 @@ public class WindowsSettingsStorage : ISettingsStorage
     /// <inheritdoc/>
     public object GetValue(string path, Type type)
     {
+        (ApplicationDataContainer? container, string key) = GetContainerAndKey(path);
+
         if (type.IsArray)
         {
             Type elementType = type.GetElementType()!;
@@ -87,10 +113,10 @@ public class WindowsSettingsStorage : ISettingsStorage
                 throw new InvalidOperationException($"Type {elementType} is not supported by {nameof(WindowsSettingsStorage)}");
 
             // WinRT ApplicationDataContainer cannot store empty arrays.
-            if (container.Values.ContainsKey(path))
+            if (container is not null && container.Values.ContainsKey(key))
             {
                 // If the key exists, return the stored array, which is never empty.
-                object value = container.Values[path];
+                object value = container.Values[key];
 
                 // Check that the stored value is an array of the correct type.
                 if (value.GetType().GetElementType() != elementType)
@@ -111,10 +137,10 @@ public class WindowsSettingsStorage : ISettingsStorage
         if (!IsTypeSupported(type))
             throw new InvalidOperationException($"Type {type} is not supported by {nameof(WindowsSettingsStorage)}");
 
-        if (!container.Values.ContainsKey(path))
-            throw new KeyNotFoundException($"Key {path} not found.");
+        if (container is null || !container.Values.ContainsKey(key))
+            throw new KeyNotFoundException($"Path {path} not found.");
 
-        return container.Values[path];
+        return container.Values[key];
     }
 
     #endregion
@@ -137,11 +163,24 @@ public class WindowsSettingsStorage : ISettingsStorage
         if (value is null)
             throw new ArgumentNullException(nameof(value));
 
+        // Create container from path if not exists
+        var parts = path.Split('/');
+        var container = _container;
+        for (int i = 0; i < parts.Length - 1; i++)
+        {
+            var part = parts[i];
+            if (!container.Containers.ContainsKey(part))
+                container.CreateContainer(part, ApplicationDataCreateDisposition.Always);
+            container = container.Containers[part];
+        }
+        var key = parts[^1];
+
+        // Set the value using `key` in `container`
         if (type.IsEnum)
         {
             // Store enums as their integral types
             var integralValue = Convert.ChangeType(value, Enum.GetUnderlyingType(type));
-            container.Values[path] = integralValue;
+            container.Values[key] = integralValue;
         }
         else if (type.IsArray)
         {
@@ -151,9 +190,9 @@ public class WindowsSettingsStorage : ISettingsStorage
 
             // If array is empty, remove the item, because empty array cannot be stored in ApplicationDataContainer.
             if (value is Array { Length: 0 })
-                container.Values[path] = null;
+                container.Values[key] = null;
             else if (value is Array)
-                container.Values[path] = value;
+                container.Values[key] = value;
         }
         else // Other single values
         {
@@ -161,7 +200,7 @@ public class WindowsSettingsStorage : ISettingsStorage
             if (!IsTypeSupported(type))
                 throw new InvalidOperationException($"Type {type} is not supported by {nameof(WindowsSettingsStorage)}");
 
-            container.Values[path] = value;
+            container.Values[key] = value;
         }
     }
 
