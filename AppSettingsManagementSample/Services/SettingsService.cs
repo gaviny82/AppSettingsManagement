@@ -15,17 +15,17 @@ namespace AppSettingsManagementSample.Services;
 internal partial class SettingsService
 {
     // Settings containers
-    public AccountInformation ActiveAccount { get; private set; } = null!;
+    //public AccountInformation ActiveAccount { get; private set; } = null!;
 
     // Arrays
-    public SettingsCollection<int> IntList { get; private set; } = null!;
+    //public SettingsCollection<int> IntList { get; private set; } = null!;
 
 
-    protected override void InitializeContainers()
-    {
-        ActiveAccount = new AccountInformation(Storage, nameof(ActiveAccount), this);
-        IntList = new SettingsCollection<int>(Storage, "IntList");
-    }
+    //protected override void InitializeContainers()
+    //{
+    //    ActiveAccount = new AccountInformation(Storage, nameof(ActiveAccount), this);
+    //    IntList = new SettingsCollection<int>(Storage, "IntList");
+    //}
 
 }
 
@@ -51,7 +51,7 @@ internal partial class SettingsService : SettingsContainer
     [SettingsCollection(typeof(int), "IntList")]
 
     // TODO: Test containers
-    [SettingsContainer(typeof(AccountInformation), nameof(ActiveAccount))] // Composite values
+    [SettingsContainer(typeof(AccountInformation), "ActiveAccount")] // Composite values
 
     // TODO: Test converters
 

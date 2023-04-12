@@ -30,10 +30,10 @@ namespace AppSettingsManagement.Generators
             context.RegisterForSyntaxNotifications(() => new SettingsContainerSyntaxReceiver());
         }
 
-        string GenerateSettingItem(AttributeSyntax attributeSyntax)
+        void GenerateSettingItem(AttributeSyntax attributeSyntax, StringBuilder memberBuilder)
         {
             var arguments = attributeSyntax.ArgumentList.Arguments;
-            if (arguments.Count < 2) return "";
+            if (arguments.Count < 2) return;
 
             // Parse property type
             string propertyType = arguments[0].Expression.ToString();
@@ -62,7 +62,7 @@ namespace AppSettingsManagement.Generators
             // If default value is not provided, the property is nullable
             string nullable = string.IsNullOrEmpty(defaultValue) ? "?" : "";
 
-            return $$"""
+            memberBuilder.Append($$"""
                         public {{propertyType}}{{nullable}} {{propertyName}}
                         {
                             get => GetValue<{{propertyType}}{{nullable}}>(nameof({{propertyName}}){{defaultValue}}{{converter}});
@@ -71,17 +71,64 @@ namespace AppSettingsManagement.Generators
 
                         public event global::AppSettingsManagement.SettingChangedEventHandler? {{propertyName}}Changed;
 
-                """;
+
+                """);
         }
 
-        string GenerateSettingsContainer(AttributeSyntax attribute)
+        void GenerateSettingsContainer(AttributeSyntax attributeSyntax, StringBuilder membersBuilder, StringBuilder initBuilder)
         {
-            return "";
+            var arguments = attributeSyntax.ArgumentList.Arguments;
+            if (arguments.Count < 2) return;
+
+            // Parse property type
+            string propertyType = arguments[0].Expression.ToString();
+            propertyType = propertyType.Substring("typeof(".Length, propertyType.Length - 1 - "typeof(".Length); // Remove typeof()
+
+            // Parse property name
+            string propertyName = arguments[1].Expression.ToString().Trim('"');
+
+            // Generate code
+            membersBuilder.Append($$"""
+                        public {{propertyType}} {{propertyName}} { get; private set; } = null!;
+
+                """);
+
+            initBuilder.Append($$"""
+                            {{propertyName}} = new {{propertyType}}(Storage, "{{propertyName}}", this);
+
+                """);
         }
 
-        string GenerateSettingsArray(AttributeSyntax attribute)
+        void GenerateSettingsCollection(AttributeSyntax attributeSyntax, StringBuilder membersBuilder, StringBuilder initBuilder)
         {
-            return "";
+            var arguments = attributeSyntax.ArgumentList.Arguments;
+            if (arguments.Count < 2) return;
+
+            // Parse property type
+            string elementType = arguments[0].Expression.ToString();
+            elementType = elementType.Substring("typeof(".Length, elementType.Length - 1 - "typeof(".Length); // Remove typeof()
+
+            // Parse property name
+            string propertyName = arguments[1].Expression.ToString().Trim('"');
+
+            // Parse converter
+            string converter = "";
+            if (arguments.Count > 2)
+            {
+                string converterType = arguments[2].Expression.ToString();
+                converter = $", global::AppSettingsManagement.DataTypeConverters.GetConverter(typeof({converterType}))";
+            }
+
+            // Generate code
+            membersBuilder.Append($$"""
+                        public global::AppSettingsManagement.SettingsCollection<{{elementType}}> {{propertyName}} { get; private set; } = null!;
+
+                """);
+
+            initBuilder.Append($$"""
+                            {{propertyName}} = new global::AppSettingsManagement.SettingsCollection<{{elementType}}>(Storage, "{{propertyName}}"{{converter}});
+
+                """);
         }
 
         public void Execute(GeneratorExecutionContext context)
@@ -99,21 +146,19 @@ namespace AppSettingsManagement.Generators
                 string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
 
                 var membersBuilder = new StringBuilder();
+                var initBuilder = new StringBuilder();
                 foreach (var attributeInfo in constructorAttributes)
                 {
                     string attributeName = attributeInfo.Name.ToString();
                     if (attributeName.EndsWith("Attribute"))
                         attributeName = attributeName.Substring(0, attributeName.Length - "Attribute".Length);
 
-                    string memberGenerated = "";
                     if (attributeName == "SettingItem")
-                        memberGenerated = GenerateSettingItem(attributeInfo);
+                        GenerateSettingItem(attributeInfo, membersBuilder);
                     else if (attributeName == "SettingsContainer")
-                        memberGenerated = GenerateSettingsContainer(attributeInfo);
-                    else if (attributeName == "SettingsContainer")
-                        memberGenerated = GenerateSettingsContainer(attributeInfo);
-
-                    membersBuilder.Append($"{memberGenerated}\n");
+                        GenerateSettingsContainer(attributeInfo, membersBuilder, initBuilder);
+                    else if (attributeName == "SettingsCollection")
+                        GenerateSettingsCollection(attributeInfo, membersBuilder, initBuilder);
                 }
 
                 var source = $$"""
@@ -126,6 +171,11 @@ namespace AppSettingsManagement.Generators
                         partial class {{className}}
                         {
                     {{membersBuilder}}
+
+                            protected override void InitializeContainers()
+                            {
+                    {{initBuilder}}
+                            }
                         }
                     }
                     """;

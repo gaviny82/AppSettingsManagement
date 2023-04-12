@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace AppSettingsManagement;
 
+// TODO: test if T can be nullable in ApplicationDataContainer
 public class SettingsCollection<T> : ObservableCollection<T>
 {
     private readonly ISettingsStorage _settingsStorage;
