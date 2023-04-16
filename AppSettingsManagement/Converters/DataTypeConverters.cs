@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AppSettingsManagement;
+namespace AppSettingsManagement.Converters;
 
 /// <summary>
 /// ConvertFrom is used when converting an object from the displayed type to the stored type. <br/>
@@ -28,7 +28,7 @@ public interface IDataTypeConverter
 public static class DataTypeConverters
 {
     public static Dictionary<Type, IDataTypeConverter> Converters { get; } = new();
-    
+
     /// <summary>
     /// Returns an instance of the converter for the specified type.
     /// </summary>

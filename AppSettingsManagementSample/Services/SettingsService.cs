@@ -1,4 +1,5 @@
 ﻿using AppSettingsManagement;
+using AppSettingsManagement.Converters;
 using AppSettingsManagement.Windows;
 using System;
 using System.Collections.Generic;
@@ -30,10 +31,11 @@ internal partial class SettingsService : SettingsContainer
     // Test lists
     [SettingsCollection(typeof(int), "IntList")]
 
-    // TODO: Test containers
+    // Test containers
     [SettingsContainer(typeof(AccountInformation), "ActiveAccount")] // Composite values
 
-    // TODO: Test converters
+    // Test converters
+    [SettingItem(typeof(Student), "Student", Converter = typeof(JsonStringConverter<Student>))]
 
     #endregion
 
@@ -66,4 +68,12 @@ internal partial class AccountInformation : SettingsContainer
     #endregion
 
     public AccountInformation(ISettingsStorage storage, string name, ISettingsContainer parent) : base(storage, name, parent) { }
+}
+
+internal class Student
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+    public char Gender { get; set; }
+    public string Year { get; set; }
 }
