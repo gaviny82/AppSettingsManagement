@@ -16,6 +16,8 @@ namespace AppSettingsManagement.Generators
     [Generator(LanguageNames.CSharp)]
     public class SettingsItemSourceGenerator : ISourceGenerator
     {
+        Compilation _compilation;
+
         public SettingsItemSourceGenerator()
         {
 #if DEBUG
@@ -28,6 +30,13 @@ namespace AppSettingsManagement.Generators
         public void Initialize(GeneratorInitializationContext context)
         {
             context.RegisterForSyntaxNotifications(() => new SettingsContainerSyntaxReceiver());
+        }
+
+        string GetFullNameFromTypeOfExpression(TypeOfExpressionSyntax typeofExpression)
+        {
+            var semanticModel = _compilation.GetSemanticModel(typeofExpression.SyntaxTree);
+            var typeInfo = semanticModel.GetTypeInfo(typeofExpression.Type);
+            return $"typeof(global::{typeInfo.Type.ToDisplayString()})";
         }
 
         void GenerateSettingItem(AttributeSyntax attributeSyntax, StringBuilder memberBuilder)
@@ -54,8 +63,9 @@ namespace AppSettingsManagement.Generators
                 }
                 else if (arguments[i].NameEquals?.Name.ToString() == "Converter")
                 {
-                    string converterType = arguments[i].Expression.ToString();
-                    converter = $", global::AppSettingsManagement.DataTypeConverters.GetConverter(typeof({converterType}))";
+                    var converterTypeofExpression = arguments[i].Expression as TypeOfExpressionSyntax;
+                    string converterName = GetFullNameFromTypeOfExpression(converterTypeofExpression);
+                    converter = $", global::AppSettingsManagement.Converters.DataTypeConverters.GetConverter({converterName})";
                 }
             }
 
@@ -115,8 +125,9 @@ namespace AppSettingsManagement.Generators
             string converter = "";
             if (arguments.Count > 2)
             {
-                string converterType = arguments[2].Expression.ToString();
-                converter = $", global::AppSettingsManagement.DataTypeConverters.GetConverter(typeof({converterType}))";
+                var converterTypeofExpression = arguments[2].Expression as TypeOfExpressionSyntax;
+                string converterName = GetFullNameFromTypeOfExpression(converterTypeofExpression);
+                converter = $", global::AppSettingsManagement.Converters.DataTypeConverters.GetConverter({converterName})";
             }
 
             // Generate code
@@ -134,11 +145,11 @@ namespace AppSettingsManagement.Generators
         public void Execute(GeneratorExecutionContext context)
         {
             var syntaxReceiver = (SettingsContainerSyntaxReceiver)context.SyntaxReceiver;
-
+            _compilation = context.Compilation;
+            
             foreach (var (classDeclaration, constructorAttributes) in syntaxReceiver.SettingsContainerConstructorAttributes)
             {
-                INamedTypeSymbol classSymbol = 
-                    (INamedTypeSymbol)context.Compilation
+                INamedTypeSymbol classSymbol = (INamedTypeSymbol)_compilation
                     .GetSemanticModel(classDeclaration.SyntaxTree)
                     .GetDeclaredSymbol(classDeclaration);
 

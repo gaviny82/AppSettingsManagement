@@ -36,7 +36,7 @@ public static class DataTypeConverters
     /// <remarks>
     /// Singletons of the converters are stored in the Converters dictionary.
     /// </remarks>
-    public static void GetConverter(Type type)
+    public static IDataTypeConverter GetConverter(Type type)
     {
         // Checks if type is IDataTypeConverter
         if (typeof(IDataTypeConverter).IsAssignableFrom(type))
@@ -48,6 +48,7 @@ public static class DataTypeConverters
                 var converter = (IDataTypeConverter)Activator.CreateInstance(type)!;
                 Converters.Add(type, converter);
             }
+            return Converters[type];
         }
         else
         {
