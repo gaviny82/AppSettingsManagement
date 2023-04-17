@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text.Json;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
@@ -96,6 +97,8 @@ namespace AppSettingsManagementSample
             testListContent.Text = string.Join(", ", SettingsManager.IntList);
             username.Text = SettingsManager.ActiveAccount.Username;
             password.Text = SettingsManager.ActiveAccount.Password;
+            var s = SettingsManager.Student;
+            studentInfo.Text = JsonSerializer.Serialize(s);
         }
 
 
@@ -105,12 +108,17 @@ namespace AppSettingsManagementSample
             SettingsManager.TestStringWithDefault = testStringWithDefault.Text;
             int? i = int.TryParse(testInt.Text, out int test_int) ? test_int : null;
             SettingsManager.TestInt = i;
-            SettingsManager.TestIntWithDefault = int.Parse(testIntWithDefault.Text);
+            SettingsManager.TestIntWithDefault = int.TryParse(testIntWithDefault.Text, out int num) ? num : -1;
             SettingsManager.Theme = (Theme)testEnumWithDefault.SelectedIndex;
             SettingsManager.TestEnum = (testEnum.SelectedIndex == -1 ? null : (TestEnum)testEnum.SelectedIndex);
             SettingsManager.IntList.Add(Random.Shared.Next());
             SettingsManager.ActiveAccount.Username = username.Text;
             SettingsManager.ActiveAccount.Password = password.Text;
+            SettingsManager.Student = new Student
+            {
+                Name = "Test",
+                Age = 20
+            };
         }
 
         private void AddStr_Click(object sender, RoutedEventArgs e)

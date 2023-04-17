@@ -26,7 +26,8 @@ public class JsonStringConverter<T> : IDataTypeConverter
     /// <param name="source"></param>
     /// <returns></returns>
     public T? Convert(string json) => (T?)((IDataTypeConverter)this).Convert(json);
-
+    
+    /// <inheritdoc/>
     object? IDataTypeConverter.Convert(object? source)
     {
         if (source is not string json)
@@ -42,6 +43,7 @@ public class JsonStringConverter<T> : IDataTypeConverter
     /// <returns></returns>
     public string? Convert(T target) => (string?)((IDataTypeConverter)this).ConvertFrom(target);
 
+    /// <inheritdoc/>
     object? IDataTypeConverter.ConvertFrom(object? target)
     {
         if (target is not T)

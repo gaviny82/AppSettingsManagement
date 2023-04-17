@@ -93,8 +93,8 @@ public abstract class SettingsContainer : ISettingsContainer
         {
             if (converter.TargetType == type)
             {
-                object value = Storage.GetValue(path, type);
-                if (value.GetType() == converter.TargetType)
+                object value = Storage.GetValue(path, converter.SourceType);
+                if (value.GetType() == converter.SourceType)
                     return (T?)converter.Convert(value);
             }
 
@@ -163,7 +163,7 @@ public abstract class SettingsContainer : ISettingsContainer
             if (typeof(T) != converter.TargetType)
                 throw new ArgumentException($"Type converter given cannot convert from {typeof(T)}", nameof(converter));
 
-            object? convertedValue = converter.Convert(value);
+            object? convertedValue = converter.ConvertFrom(value);
 
             if(convertedValue is null)
                 Storage.DeleteItem(path);

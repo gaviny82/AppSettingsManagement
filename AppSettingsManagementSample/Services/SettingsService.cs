@@ -74,6 +74,6 @@ internal class Student
 {
     public string Name { get; set; }
     public int Age { get; set; }
-    public char Gender { get; set; }
+    public char Gender { get; set; } = 'M';
     public string Year { get; set; }
 }

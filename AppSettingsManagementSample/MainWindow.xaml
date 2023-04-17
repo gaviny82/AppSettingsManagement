@@ -60,6 +60,7 @@
                 <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Test sub-containers" />
                 <TextBox Name="username" ToolTipService.ToolTip="Username" />
                 <TextBox Name="password" ToolTipService.ToolTip="Password" />
+                <TextBlock Name="studentInfo" ToolTipService.ToolTip="Student info"/>
             </StackPanel>
 
             <TextBlock
