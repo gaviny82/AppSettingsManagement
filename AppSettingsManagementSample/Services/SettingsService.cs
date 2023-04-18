@@ -36,6 +36,7 @@ internal partial class SettingsService : SettingsContainer
 
     // Test converters
     [SettingItem(typeof(Student), "Student", Converter = typeof(JsonStringConverter<Student>))]
+    [SettingsCollection(typeof(Student), "Students", Converter = typeof(JsonStringConverter<Student>))]
 
     #endregion
 

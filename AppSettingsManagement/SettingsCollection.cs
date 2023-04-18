@@ -25,22 +25,25 @@ public class SettingsCollection<T> : ObservableCollection<T> where T : notnull
         
         if (typeConverter is not null)
         {
-            if (typeConverter.SourceType == typeof(T))
+            if (typeConverter.TargetType == typeof(T))
                 _typeConverter = typeConverter;
             else
                 throw new ArgumentException($"Typer converter given cannot convert from {typeof(T)}", nameof(typeConverter));
         }
 
-        // Load initial values from storage
-
         // Init the storage with an empty array if it doesn't exist
         if (!_settingsStorage.Contains(storagePath))
-            _settingsStorage.SetValue(storagePath, Array.Empty<T>());
+        {
+            Type elementType = _typeConverter is null ? typeof(T) : _typeConverter.SourceType;
+            _settingsStorage.SetValue(storagePath, Array.CreateInstance(elementType, 0));
+        }
+        
+        // Load initial values from storage
 
         // Get the array from the storage and apply type conversion
         if (typeConverter is not null)
         {
-            Array storedArray = (Array)_settingsStorage.GetValue(storagePath, typeConverter.SourceType);
+            Array storedArray = (Array)_settingsStorage.GetValue(storagePath, typeConverter.SourceType.MakeArrayType());
             
             // Throws if the type converter cannot convert to T
             if (typeConverter.TargetType != typeof(T))
@@ -73,8 +76,9 @@ public class SettingsCollection<T> : ObservableCollection<T> where T : notnull
         {
             if (typeof(T) != _typeConverter.TargetType)
                 throw new InvalidCastException($"Type converter given does not support convertion from {typeof(T)}");
-            
-            object?[] convertedArray = this.Select(item => _typeConverter.ConvertFrom(item)).ToArray();
+
+            Array convertedArray = Array.CreateInstance(_typeConverter.SourceType, this.Count);
+            this.Select(item => _typeConverter.ConvertFrom(item)).ToArray().CopyTo(convertedArray, 0);
             _settingsStorage.SetValue(_storagePath, convertedArray);
         }
         else // No type conversion needed

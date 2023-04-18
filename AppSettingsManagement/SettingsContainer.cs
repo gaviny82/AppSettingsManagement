@@ -152,7 +152,17 @@ public abstract class SettingsContainer : ISettingsContainer
                               IDataTypeConverter? converter = null) where T : notnull
     {
         var path = GetPathFromKey(key);
-        object? currentValue = Storage.Contains(path) ? Storage.GetValue<T>(path) : null;
+        object? currentValue;
+        if (converter is not null)
+        {
+            if (typeof(T) != converter.TargetType)
+                throw new ArgumentException($"Type converter given cannot convert from {typeof(T)}", nameof(converter));
+            currentValue = Storage.Contains(path) ? Storage.GetValue(path, converter.SourceType) : null;
+        }
+        else
+        {
+            currentValue = Storage.Contains(path) ? Storage.GetValue<T>(path) : null;
+        }
 
         if (value.Equals(currentValue))
             return;

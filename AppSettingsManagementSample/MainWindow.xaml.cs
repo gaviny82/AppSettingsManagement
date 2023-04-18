@@ -97,8 +97,8 @@ namespace AppSettingsManagementSample
             testListContent.Text = string.Join(", ", SettingsManager.IntList);
             username.Text = SettingsManager.ActiveAccount.Username;
             password.Text = SettingsManager.ActiveAccount.Password;
-            var s = SettingsManager.Student;
-            studentInfo.Text = JsonSerializer.Serialize(s);
+            studentInfo.Text = JsonSerializer.Serialize(SettingsManager.Student);
+            studentInfo.Text += JsonSerializer.Serialize(SettingsManager.Students.ToArray());
         }
 
 
@@ -114,17 +114,23 @@ namespace AppSettingsManagementSample
             SettingsManager.IntList.Add(Random.Shared.Next());
             SettingsManager.ActiveAccount.Username = username.Text;
             SettingsManager.ActiveAccount.Password = password.Text;
-            SettingsManager.Student = new Student
+            var s1 = new Student
             {
                 Name = "Test",
                 Age = 20
             };
+            var s2 = new Student
+            {
+                Name = "Test2",
+                Age = 21,
+                Year = "Senior",
+                Gender = 'F'
+            };
+            SettingsManager.Student = s1;
+            SettingsManager.Students.Add(s1);
+            SettingsManager.Students.Add(s2);
         }
 
-        private void AddStr_Click(object sender, RoutedEventArgs e)
-        {
-            //SettingsManager.Names.Add("New item");
-        }
     }
 
 }
