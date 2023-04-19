@@ -42,7 +42,7 @@ namespace AppSettingsManagementSample
             this.InitializeComponent();
 
             // TODO: test view model bindings
-            //panel.DataContext = new SettingsViewModel(SettingsManager);
+            panel.DataContext = new SettingsViewModel(SettingsManager);
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e)
