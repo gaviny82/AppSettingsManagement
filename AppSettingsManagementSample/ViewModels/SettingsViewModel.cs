@@ -98,11 +98,11 @@ internal partial class SettingsViewModel : ObservableObject
 
 
     // Bind to settings service
-    [SettingBinding(Path = nameof(SettingsService.IntList))]
+    [BindToSetting(Path = nameof(SettingsService.IntList))]
     public ObservableCollection<int> TestList { get; private set; } = null!; // Will be initialized by generated code
 
     [ObservableProperty]
-    [SettingBinding(Path = nameof(SettingsService.TestString))]
+    [BindToSetting(Path = nameof(SettingsService.TestString))]
     string? testString;
 
 }

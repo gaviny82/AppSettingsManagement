@@ -13,7 +13,7 @@ public class SettingsProviderAttribute : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public class SettingBinding : Attribute
+public class BindToSettingAttribute : Attribute
 {
     public required string Path { get; init; }
 }
