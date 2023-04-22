@@ -51,7 +51,8 @@ internal partial class SettingsViewModel
     private void InitializeSettings()
     {
         PropertyChanged += SettingsPropertyChanged;
-        WeakEventManager.WeakSubscribe(_settingsService, this, "TestStringChanged");
+        WeakSubscribe(_settingsService, this, "TestStringChanged");
+        //WeakEventManager.WeakSubscribe(_settingsService, this, "TestStringChanged");
 
         //WeakReference<SettingsViewModel> WeakReference = new(this);
 
@@ -59,9 +60,25 @@ internal partial class SettingsViewModel
         //{
         //    if (WeakReference.TryGetTarget(out var target))
         //        target.TestString = _settingsService.TestString;
+        //        //Note: capture of _settingsService (or any class member) holds a reference to this class and, hence, prevents garbage collection
         //};
         //_settingsService.TestStringChanged += testStringChangedHandler;
         //settingChangedEventHandlers.Add(testStringChangedHandler);
+    }
+
+    public static void WeakSubscribe(SettingsService settingsService, SettingsViewModel vm, string _event)
+    {
+        WeakReference<SettingsViewModel> WeakReference = new(vm);
+        SettingChangedEventHandler testStringChangedHandler = (sender, e) =>
+        {
+            if (WeakReference.TryGetTarget(out var target))
+                target.TestString = settingsService.TestString;//TODO: resolve recursive calls
+        };
+        var e = settingsService.GetType().GetEvent(_event);
+        e?.AddEventHandler(settingsService, testStringChangedHandler);
+
+        //settingsService.TestStringChanged += SettingsService_TestStringChanged;
+
     }
 
     protected void RemoveSettingsChagnedHandlers()
