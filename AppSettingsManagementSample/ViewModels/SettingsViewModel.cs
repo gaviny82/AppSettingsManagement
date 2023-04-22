@@ -29,8 +29,8 @@ class WeakEventManager
         e?.AddEventHandler(settingsService, testStringChangedHandler);
         
         //settingsService.TestStringChanged += SettingsService_TestStringChanged;
-        
-    }
+            }
+
 
     private static void SettingsService_TestStringChanged(SettingsContainer sender, SettingChangedEventArgs e)
     {
@@ -51,8 +51,7 @@ internal partial class SettingsViewModel
     private void InitializeSettings()
     {
         PropertyChanged += SettingsPropertyChanged;
-        WeakSubscribe(_settingsService, this, "TestStringChanged");
-        //WeakEventManager.WeakSubscribe(_settingsService, this, "TestStringChanged");
+        WeakEventManager.WeakSubscribe(_settingsService, this, "TestStringChanged");
 
         //WeakReference<SettingsViewModel> WeakReference = new(this);
 
@@ -66,21 +65,6 @@ internal partial class SettingsViewModel
         //settingChangedEventHandlers.Add(testStringChangedHandler);
     }
 
-    public static void WeakSubscribe(SettingsService settingsService, SettingsViewModel vm, string _event)
-    {
-        WeakReference<SettingsViewModel> WeakReference = new(vm);
-        SettingChangedEventHandler testStringChangedHandler = (sender, e) =>
-        {
-            if (WeakReference.TryGetTarget(out var target))
-                target.TestString = settingsService.TestString;//TODO: resolve recursive calls
-        };
-        var e = settingsService.GetType().GetEvent(_event);
-        e?.AddEventHandler(settingsService, testStringChangedHandler);
-
-        //settingsService.TestStringChanged += SettingsService_TestStringChanged;
-
-    }
-
     protected void RemoveSettingsChagnedHandlers()
     {
         _settingsService.TestStringChanged += settingChangedEventHandlers[0];
@@ -88,8 +72,6 @@ internal partial class SettingsViewModel
 
     private void SettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        base.OnPropertyChanged(e);
-
         if (e.PropertyName == nameof(TestString))
             _settingsService.TestString = TestString;
     }
