@@ -9,74 +9,18 @@
     xmlns:local="using:AppSettingsManagementSample"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
+    <NavigationView ItemInvoked="NavigationView_ItemInvoked">
+        <NavigationView.MenuItems>
+            <NavigationViewItem
+                Content="Home"
+                Icon="Play"
+                Tag="Home" />
+            <NavigationViewItem
+                Content="TestPage1"
+                Icon="Save"
+                Tag="TestPage1" />
+        </NavigationView.MenuItems>
 
-    <ScrollViewer>
-        <StackPanel
-            x:Name="panel"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Orientation="Vertical"
-            Spacing="4">
-
-            <TextBlock
-                FontSize="20"
-                Style="{ThemeResource BodyStrongTextBlockStyle}"
-                Text="Test programmatic operations" />
-
-            <StackPanel Orientation="Horizontal" Spacing="5">
-                <Button Click="Delete_Click" Content="Delete all settings" />
-                <Button Content="Reset all settings" IsEnabled="False" />
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" Spacing="5">
-                <Button Click="SetStrings_Click" Content="Set strings" />
-                <Button Click="SetInts_Click" Content="Set ints" />
-                <Button Click="SetEnums_Click" Content="Set enums" />
-                <Button Click="AddItemToList_Click" Content="Set list" />
-                <Button Click="SetContainer_Click" Content="Set container" />
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" Spacing="5">
-                <Button Click="GetAllValues_Click" Content="Get all values" />
-                <Button Click="SetAllValues_Click" Content="Set all values" />
-            </StackPanel>
-
-            <StackPanel Spacing="5">
-                <TextBox Name="testString" ToolTipService.ToolTip="TestString" />
-                <TextBox Name="testStringWithDefault" ToolTipService.ToolTip="TestStringWithDefault" />
-                <NumberBox Name="testInt" ToolTipService.ToolTip="TestInt" />
-                <NumberBox Name="testIntWithDefault" ToolTipService.ToolTip="TestIntWithDefault" />
-                <ComboBox Name="testEnumWithDefault" ToolTipService.ToolTip="TestEnumWithDefault">
-                    <ComboBoxItem Content="Bright" />
-                    <ComboBoxItem Content="Dark" />
-                    <ComboBoxItem Content="Default" />
-                </ComboBox>
-                <ComboBox Name="testEnum" ToolTipService.ToolTip="TestEnum">
-                    <ComboBoxItem Content="A" />
-                    <ComboBoxItem Content="B" />
-                    <ComboBoxItem Content="C" />
-                </ComboBox>
-                <TextBlock Name="testListContent" />
-                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Test sub-containers" />
-                <TextBox Name="username" ToolTipService.ToolTip="Username" />
-                <TextBox Name="password" ToolTipService.ToolTip="Password" />
-                <TextBlock Name="studentInfo" ToolTipService.ToolTip="Student info"/>
-            </StackPanel>
-
-            <TextBlock
-                Margin="0,20,0,0"
-                FontSize="20"
-                Style="{ThemeResource BodyStrongTextBlockStyle}"
-                Text="MVVM Tests" />
-            <TextBox
-                PlaceholderText="Username"
-                Text="{Binding Username, Mode=TwoWay}"
-                ToolTipService.ToolTip="Account" />
-            <TextBox
-                PlaceholderText="Password"
-                Text="{Binding Password, Mode=TwoWay}"
-                ToolTipService.ToolTip="Password" />
-
-        </StackPanel>
-    </ScrollViewer>
+        <Frame Name="ContentFrame" />
+    </NavigationView>
 </Window>
