@@ -9,7 +9,7 @@ namespace AppSettingsManagement.Windows;
 // Consider rename to WinRTSettingsStorage
 public class WindowsSettingsStorage : ISettingsStorage
 {
-    private readonly ApplicationDataContainer _container;
+    private readonly ApplicationDataContainer _rootContainer;
     private readonly Type[] supportedTypes =
     {
         //https://learn.microsoft.com/en-us/windows/apps/design/app-settings/store-and-retrieve-app-data
@@ -46,7 +46,7 @@ public class WindowsSettingsStorage : ISettingsStorage
 
     public WindowsSettingsStorage()
     {
-        _container = ApplicationData.Current.LocalSettings;
+        _rootContainer = ApplicationData.Current.LocalSettings;
     }
 
     private bool IsTypeSupported(Type? type)
@@ -65,7 +65,7 @@ public class WindowsSettingsStorage : ISettingsStorage
     private (ApplicationDataContainer?, string) GetContainerAndKey(string path)
     {
         var parts = path.Split('/');
-        var container = _container;
+        var container = _rootContainer;
         for (int i = 0; i < parts.Length - 1; i++)
         {
             var part = parts[i];
@@ -172,7 +172,7 @@ public class WindowsSettingsStorage : ISettingsStorage
 
         // Create container from path if not exists
         var parts = path.Split('/');
-        var container = _container;
+        var container = _rootContainer;
         for (int i = 0; i < parts.Length - 1; i++)
         {
             var part = parts[i];
