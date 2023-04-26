@@ -148,7 +148,7 @@ public abstract class SettingsContainer : ISettingsContainer
 
     private void _setValue<T>(string key,
                               T value,
-                              ref SettingChangedEventHandler? _event,
+                              SettingChangedEventHandler? _event,
                               IDataTypeConverter? converter = null) where T : notnull
     {
         var path = GetPathFromKey(key);
@@ -199,7 +199,7 @@ public abstract class SettingsContainer : ISettingsContainer
     /// <param name="_event"></param>
     protected void SetValue<T>(string key,
                                T? value,
-                               ref SettingChangedEventHandler? _event,
+                               SettingChangedEventHandler? _event,
                                IDataTypeConverter? converter = null) where T : struct
     {
         if (value is null)
@@ -207,7 +207,7 @@ public abstract class SettingsContainer : ISettingsContainer
             Storage.DeleteItem(key);
             return;
         }
-        _setValue<T>(key, (T)value, ref _event, converter);
+        _setValue<T>(key, (T)value, _event, converter);
     }
 
     /// <summary>
@@ -219,7 +219,7 @@ public abstract class SettingsContainer : ISettingsContainer
     /// <param name="_event"></param>
     protected void SetValue<T>(string key,
                                T? value,
-                               ref SettingChangedEventHandler? _event,
+                               SettingChangedEventHandler? _event,
                                IDataTypeConverter? converter = null) where T : class
     {
         if (value is null)
@@ -227,53 +227,8 @@ public abstract class SettingsContainer : ISettingsContainer
             Storage.DeleteItem(key);
             return;
         }
-        _setValue<T>(key, value, ref _event, converter);
+        _setValue<T>(key, value, _event, converter);
     }
-
-    //protected void SetValue(string key,
-    //                        object value,
-    //                        ref SettingChangedEventHandler? _event,
-    //                        IDataTypeConverter? converter = null)
-    //{
-    //    string path = GetPathFromKey(key);
-
-    //    // Remove the setting item if set to null
-    //    if (value is null)
-    //    {
-    //        Storage.DeleteItem(path);
-    //        return;
-    //    }
-
-
-    //    // If a type converter is given, store the converted value
-    //    if (converter is not null)
-    //    {
-    //        object? currentValue = Storage.Contains(path) ? Storage.GetValue(path, converter.TargetType) : null;
-
-    //        if (converter.TargetType != value.GetType())
-    //            throw new ArgumentException($"Typer converter given cannot convert to {value.GetType()}", nameof(converter));
-
-    //        // Only invoke events when the new value is different
-    //        if (!value.Equals(currentValue))
-    //        {
-    //            Storage.SetValue(path, converter.Convert(value));
-    //            _event?.Invoke(this, new SettingChangedEventArgs(path, value));
-    //            SettingsChanged?.Invoke(this, new SettingChangedEventArgs(path, value));
-    //        }
-    //    }
-    //    else // No type converter specified, store the value as is
-    //    {
-    //        object? currentValue = Storage.Contains(path) ? Storage.GetValue(path, value.GetType()) : null;
-
-    //        // Only invoke events when the new value is different
-    //        if (!value.Equals(currentValue))
-    //        {
-    //            Storage.SetValue(path, value);
-    //            _event?.Invoke(this, new SettingChangedEventArgs(path, value));
-    //            SettingsChanged?.Invoke(this, new SettingChangedEventArgs(path, value));
-    //        }
-    //    }   
-    //}
 
     #endregion SetValue<T>
 }

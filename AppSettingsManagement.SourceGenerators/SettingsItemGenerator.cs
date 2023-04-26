@@ -76,7 +76,7 @@ namespace AppSettingsManagement.Generators
                         public {{propertyType}}{{nullable}} {{propertyName}}
                         {
                             get => GetValue<{{propertyType}}{{nullable}}>(nameof({{propertyName}}){{defaultValue}}{{converter}});
-                            set => SetValue<{{propertyType}}>(nameof({{propertyName}}), value, ref {{propertyName}}Changed{{converter}});
+                            set => SetValue<{{propertyType}}>(nameof({{propertyName}}), value, {{propertyName}}Changed{{converter}});
                         }
 
                         public event global::AppSettingsManagement.SettingChangedEventHandler? {{propertyName}}Changed;

@@ -50,6 +50,7 @@ public sealed partial class HomePage : Page
         foreach (var c in LocalSettings.Containers.Keys)
             LocalSettings.DeleteContainer(c);
         SettingsManager.IntList.Clear();
+        SettingsManager.Students.Clear();
     }
 
     private void SetStrings_Click(object sender, RoutedEventArgs e)
