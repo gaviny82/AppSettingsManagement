@@ -73,6 +73,12 @@
                 PlaceholderText="TestString"
                 Text="{Binding TestString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ToolTipService.ToolTip="TestString" />
+            <ListView x:Name="listView" ItemsSource="{Binding TestList}" />
+            <Button Command="{Binding AddItemCommand}" Content="Add item" />
+            <Button
+                Command="{Binding DeleteItemCommand}"
+                CommandParameter="{Binding ElementName=listView, Path=SelectedIndex}"
+                Content="Delete item" />
         </StackPanel>
     </ScrollViewer>
 

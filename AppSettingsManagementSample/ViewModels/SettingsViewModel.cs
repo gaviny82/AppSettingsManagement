@@ -1,6 +1,7 @@
 ﻿using AppSettingsManagement;
 using AppSettingsManagementSample.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -46,6 +47,9 @@ partial class SettingsViewModel
         container.TestStringChanged += testStringChangedHandler;
         handlers[nameof(container.TestStringChanged)] = testStringChangedHandler;
 
+        // Generate: TestListChanged
+        TestList = container.IntList;
+
         // Freeze event handlers dictionary
         __settingChangedEventHandlers = new(handlers);
 
@@ -86,12 +90,26 @@ internal partial class SettingsViewModel : ObservableObject
         RemoveSettingsChagnedHandlers();
     }
 
-    // Bind to settings service
+    // Bind to settings service for collection
     [BindToSetting(Path = nameof(SettingsService.IntList))]
     public ObservableCollection<int> TestList { get; private set; } = null!; // Will be initialized by generated code
 
+    // Bind to settings service for a single value
     [ObservableProperty]
     [BindToSetting(Path = nameof(SettingsService.TestString))]
     string? testString;
 
+    // TODO: Bind to an item in a subcontainer
+
+    [RelayCommand]
+    void AddItem()
+    {
+        TestList.Add(TestList.Count);
+    }
+
+    [RelayCommand]
+    void DeleteItem(int index)
+    {
+        TestList.RemoveAt(index);
+    }
 }
