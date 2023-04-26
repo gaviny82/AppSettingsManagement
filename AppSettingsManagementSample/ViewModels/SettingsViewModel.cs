@@ -45,7 +45,17 @@ partial class SettingsViewModel
                 target.TestString = container.TestString;
         };
         container.TestStringChanged += testStringChangedHandler;
-        handlers[nameof(container.TestStringChanged)] = testStringChangedHandler;
+        handlers[nameof(SettingsService.TestString)] = testStringChangedHandler;
+
+        // Generate: TestStringChanged
+        Username = container.ActiveAccount.Username;
+        SettingChangedEventHandler usernameChangedHandler = (sender, e) =>
+        {
+            if (weakref.TryGetTarget(out var target))
+                target.Username = container.ActiveAccount.Username;
+        };
+        container.ActiveAccount.UsernameChanged += usernameChangedHandler;
+        handlers[$"{nameof(SettingsService.ActiveAccount)}/{nameof(SettingsService.ActiveAccount.Username)}"] = usernameChangedHandler;
 
         // Generate: TestListChanged
         TestList = container.IntList;
@@ -61,6 +71,8 @@ partial class SettingsViewModel
     {
         if (e.PropertyName == nameof(TestString))
             _settingsService.TestString = TestString;
+        else if (e.PropertyName == nameof(Username))
+            _settingsService.ActiveAccount.Username = Username;
     }
 
     /// <summary>
@@ -69,7 +81,8 @@ partial class SettingsViewModel
     [GeneratedCode("AppSettingsManagement", "alpha")]
     private void RemoveSettingsChagnedHandlers()
     {
-        _settingsService.TestStringChanged -= __settingChangedEventHandlers[nameof(_settingsService.TestStringChanged)];
+        _settingsService.TestStringChanged -= __settingChangedEventHandlers[nameof(SettingsService.TestString)]; // Use the path specified in BindToSettingAttribute
+        _settingsService.ActiveAccount.UsernameChanged -= __settingChangedEventHandlers[$"{nameof(SettingsService.ActiveAccount)}/{nameof(SettingsService.ActiveAccount.Username)}"];
     }
 }
 
@@ -90,16 +103,19 @@ internal partial class SettingsViewModel : ObservableObject
         RemoveSettingsChagnedHandlers();
     }
 
-    // Bind to settings service for collection
-    [BindToSetting(Path = nameof(SettingsService.IntList))]
-    public ObservableCollection<int> TestList { get; private set; } = null!; // Will be initialized by generated code
-
-    // Bind to settings service for a single value
+    // Test: Bind to a single value
     [ObservableProperty]
     [BindToSetting(Path = nameof(SettingsService.TestString))]
     string? testString;
 
-    // TODO: Bind to an item in a subcontainer
+    // Test: Bind to an item in a subcontainer
+    [ObservableProperty]
+    [BindToSetting(Path = $"{nameof(SettingsService.ActiveAccount)}/{nameof(SettingsService.ActiveAccount.Username)}")]
+    string? username;
+
+    // Test: Bind to settings service for collection
+    [BindToSetting(Path = nameof(SettingsService.IntList))]
+    public ObservableCollection<int> TestList { get; private set; } = null!; // Will be initialized by generated code
 
     [RelayCommand]
     void AddItem()

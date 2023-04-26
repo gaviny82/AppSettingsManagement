@@ -79,6 +79,11 @@
                 Command="{Binding DeleteItemCommand}"
                 CommandParameter="{Binding ElementName=listView, Path=SelectedIndex}"
                 Content="Delete item" />
+            <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Active account" />
+            <TextBox
+                PlaceholderText="ActiveAccount.Username"
+                Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ToolTipService.ToolTip="ActiveAccount.Username" />
         </StackPanel>
     </ScrollViewer>
 
