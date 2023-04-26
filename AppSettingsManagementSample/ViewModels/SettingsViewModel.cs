@@ -50,12 +50,13 @@ partial class SettingsViewModel
         __settingChangedEventHandlers = new(handlers);
 
         // Subscribe to setting changed event to update view model
-        PropertyChanged += (object? sender, PropertyChangedEventArgs e) =>
-        {
-            if (e.PropertyName == nameof(TestString))
-                _settingsService.TestString = TestString;
-            //else if ...
-        };
+        PropertyChanged += __UpdateSettingItems;
+    }
+
+    private void __UpdateSettingItems(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(TestString))
+            _settingsService.TestString = TestString;
     }
 
     /// <summary>
