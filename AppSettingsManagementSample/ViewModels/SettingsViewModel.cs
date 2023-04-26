@@ -1,4 +1,5 @@
 ﻿using AppSettingsManagement;
+using AppSettingsManagement.Mvvm;
 using AppSettingsManagementSample.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -9,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
@@ -24,18 +26,19 @@ namespace AppSettingsManagementSample.ViewModels;
 partial class SettingsViewModel
 {
     [GeneratedCode("AppSettingsManagement", "alpha")]
-    private ReadOnlyDictionary<string, SettingChangedEventHandler> __settingChangedEventHandlers = null!;
+    SettingsContainer ISettingsViewModel.SettingsContainer => _settingsService;
 
-    /// <summary>
-    /// This should be called in the constructor. Initialize view model and register events for updating view model when settings are changed.
-    /// </summary>
     [GeneratedCode("AppSettingsManagement", "alpha")]
-    private void InitializeSettings()
+    Dictionary<string, SettingChangedEventHandler> ISettingsViewModel.SettingChangedEventHandlers { get; } = new();
+
+    /// <inheritdoc/>
+    [GeneratedCode("AppSettingsManagement", "alpha")]
+    void ISettingsViewModel.InitializeSettings()
     {
         //Note: capture of _settingsService (or any class member) holds a reference to this class and, hence, prevents garbage collection
         SettingsService container = _settingsService;// Avoid capture of class member _settingsService in event handlers
         WeakReference<SettingsViewModel> weakref = new(this);
-        Dictionary<string, SettingChangedEventHandler> handlers = new();
+        Dictionary<string, SettingChangedEventHandler> handlers = ((ISettingsViewModel)this).SettingChangedEventHandlers;
 
         // Generate: TestStringChanged
         TestString = container.TestString;
@@ -60,14 +63,13 @@ partial class SettingsViewModel
         // Generate: TestListChanged
         TestList = container.IntList;
 
-        // Freeze event handlers dictionary
-        __settingChangedEventHandlers = new(handlers);
-
         // Subscribe to setting changed event to update view model
-        PropertyChanged += __UpdateSettingItems;
+        PropertyChanged += ((ISettingsViewModel)this).SettingsViewModelPropertyChangedCallback;
     }
 
-    private void __UpdateSettingItems(object? sender, PropertyChangedEventArgs e)
+    /// <inheritdoc/>
+    [GeneratedCode("AppSettingsManagement", "alpha")]
+    void ISettingsViewModel.SettingsViewModelPropertyChangedCallback(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(TestString))
             _settingsService.TestString = TestString;
@@ -75,19 +77,18 @@ partial class SettingsViewModel
             _settingsService.ActiveAccount.Username = Username;
     }
 
-    /// <summary>
-    /// This should be called in the destructor. Unregister events for updating view model when settings are changed.
-    /// </summary>
+    /// <inheritdoc/>
     [GeneratedCode("AppSettingsManagement", "alpha")]
-    private void RemoveSettingsChagnedHandlers()
+    void ISettingsViewModel.RemoveSettingsChagnedHandlers()
     {
-        _settingsService.TestStringChanged -= __settingChangedEventHandlers[nameof(SettingsService.TestString)]; // Use the path specified in BindToSettingAttribute
-        _settingsService.ActiveAccount.UsernameChanged -= __settingChangedEventHandlers[$"{nameof(SettingsService.ActiveAccount)}/{nameof(SettingsService.ActiveAccount.Username)}"];
+        Dictionary<string, SettingChangedEventHandler> handlers = ((ISettingsViewModel)this).SettingChangedEventHandlers;
+        _settingsService.TestStringChanged -= handlers[nameof(SettingsService.TestString)]; // Use the path specified in BindToSettingAttribute
+        _settingsService.ActiveAccount.UsernameChanged -= handlers[$"{nameof(SettingsService.ActiveAccount)}/{nameof(SettingsService.ActiveAccount.Username)}"];
     }
 }
 
 
-internal partial class SettingsViewModel : ObservableObject
+internal partial class SettingsViewModel : ObservableObject, ISettingsViewModel
 {
     [SettingsProvider]
     private readonly SettingsService _settingsService;
@@ -95,12 +96,12 @@ internal partial class SettingsViewModel : ObservableObject
     public SettingsViewModel(SettingsService settingsService)
     {
         _settingsService = settingsService;
-        InitializeSettings();
+        ((ISettingsViewModel)this).InitializeSettings();
     }
 
     ~SettingsViewModel()
     {
-        RemoveSettingsChagnedHandlers();
+        ((ISettingsViewModel)this).RemoveSettingsChagnedHandlers();
     }
 
     // Test: Bind to a single value
@@ -111,7 +112,7 @@ internal partial class SettingsViewModel : ObservableObject
     // Test: Bind to an item in a subcontainer
     [ObservableProperty]
     [BindToSetting(Path = $"{nameof(SettingsService.ActiveAccount)}/{nameof(SettingsService.ActiveAccount.Username)}")]
-    string? username;
+    string username = null!; // Will be initialized by generated code, should not be declared as nullable because it will be bound to a non-nullable setting item.
 
     // Test: Bind to settings service for collection
     [BindToSetting(Path = nameof(SettingsService.IntList))]
