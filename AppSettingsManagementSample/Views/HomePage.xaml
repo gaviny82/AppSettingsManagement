@@ -70,14 +70,9 @@
                 Style="{ThemeResource BodyStrongTextBlockStyle}"
                 Text="MVVM Tests" />
             <TextBox
-                PlaceholderText="Username"
-                Text="{Binding Username, Mode=TwoWay}"
-                ToolTipService.ToolTip="Account" />
-            <TextBox
-                PlaceholderText="Password"
-                Text="{Binding Password, Mode=TwoWay}"
-                ToolTipService.ToolTip="Password" />
-
+                PlaceholderText="TestString"
+                Text="{Binding TestString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ToolTipService.ToolTip="TestString" />
         </StackPanel>
     </ScrollViewer>
 

@@ -37,6 +37,7 @@ partial class SettingsViewModel
         Dictionary<string, SettingChangedEventHandler> handlers = new();
 
         // Generate: TestStringChanged
+        TestString = container.TestString;
         SettingChangedEventHandler testStringChangedHandler = (sender, e) =>
         {
             if (weakref.TryGetTarget(out var target))

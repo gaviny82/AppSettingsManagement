@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using AppSettingsManagementSample.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -27,6 +28,6 @@ public sealed partial class TestPage1 : Page
 {
     public TestPage1()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 }

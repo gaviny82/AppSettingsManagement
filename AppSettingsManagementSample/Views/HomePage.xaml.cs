@@ -36,11 +36,11 @@ public sealed partial class HomePage : Page
 
     public HomePage()
     {
-        this.InitializeComponent();
-        // TODO: test view model bindings
-        DataContext = new SettingsViewModel(SettingsManager);
-    }
+        InitializeComponent();
 
+        // Test view model bindings
+        DataContext = new SettingsViewModel(MainWindow.SettingsManager);
+    }
 
     private void Delete_Click(object sender, RoutedEventArgs e)
         => DeleteAllSettings();
