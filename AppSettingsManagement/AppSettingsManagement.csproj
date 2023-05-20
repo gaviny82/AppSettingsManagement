@@ -5,4 +5,26 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- NuGet -->
+  <PropertyGroup>
+    <PackageId>AppSettingsManagement</PackageId>
+    <Version>0.1.1-alpha</Version>
+    <Authors>GavinY</Authors>
+    <Description>A library for managing app settings and MVVM bindings</Description>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/gaviny82/AppSettingsManagement</PackageProjectUrl>
+
+    <!-- Generate symbols -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <!-- Files for packing -->
+  <ItemGroup>
+    <None Include="..\LICENSE.txt" Pack="true" PackagePath=""/>
+    <None Include="..\README.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
+
 </Project>
