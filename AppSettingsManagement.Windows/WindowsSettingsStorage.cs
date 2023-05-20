@@ -7,7 +7,7 @@ using Windows.UI.ViewManagement;
 namespace AppSettingsManagement.Windows;
 
 // Consider rename to WinRTSettingsStorage
-public class WindowsSettingsStorage : ISettingsStorage
+public class WinRTSettingsStorage : ISettingsStorage
 {
     private readonly ApplicationDataContainer _rootContainer;
     private readonly Type[] supportedTypes =
@@ -44,7 +44,7 @@ public class WindowsSettingsStorage : ISettingsStorage
     };
 
 
-    public WindowsSettingsStorage()
+    public WinRTSettingsStorage()
     {
         _rootContainer = ApplicationData.Current.LocalSettings;
     }
@@ -109,7 +109,7 @@ public class WindowsSettingsStorage : ISettingsStorage
             Type elementType = type.GetElementType()!;
 
             if (!IsTypeSupported(elementType))
-                throw new InvalidOperationException($"Type {elementType} is not supported by {nameof(WindowsSettingsStorage)}");
+                throw new InvalidOperationException($"Type {elementType} is not supported by {nameof(WinRTSettingsStorage)}");
 
             // WinRT ApplicationDataContainer cannot store empty arrays.
             if (container is not null && container.Values.ContainsKey(key))
@@ -134,7 +134,7 @@ public class WindowsSettingsStorage : ISettingsStorage
 
         // Check the type requested
         if (!IsTypeSupported(type))
-            throw new InvalidOperationException($"Type {type} is not supported by {nameof(WindowsSettingsStorage)}");
+            throw new InvalidOperationException($"Type {type} is not supported by {nameof(WinRTSettingsStorage)}");
 
         if (container is null || !container.Values.ContainsKey(key))
             throw new KeyNotFoundException($"Path {path} not found.");
@@ -193,7 +193,7 @@ public class WindowsSettingsStorage : ISettingsStorage
         {
             // Check if the array element type is supported
             if (!IsTypeSupported(type.GetElementType()))
-                throw new InvalidOperationException($"Type {type} is not supported by {nameof(WindowsSettingsStorage)}");
+                throw new InvalidOperationException($"Type {type} is not supported by {nameof(WinRTSettingsStorage)}");
 
             // If array is empty, remove the item, because empty array cannot be stored in ApplicationDataContainer.
             if (value is Array { Length: 0 })
@@ -205,7 +205,7 @@ public class WindowsSettingsStorage : ISettingsStorage
         {
             // Check if the type of `value` is supported
             if (!IsTypeSupported(type))
-                throw new InvalidOperationException($"Type {type} is not supported by {nameof(WindowsSettingsStorage)}");
+                throw new InvalidOperationException($"Type {type} is not supported by {nameof(WinRTSettingsStorage)}");
 
             container.Values[key] = value;
         }

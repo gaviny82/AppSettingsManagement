@@ -12,7 +12,7 @@ namespace AppSettingsManagementSample.Services;
 
 internal partial class SettingsService : SettingsContainer
 {
-    static readonly ISettingsStorage Provider = new WindowsSettingsStorage();
+    static readonly ISettingsStorage Provider = new WinRTSettingsStorage();
 
     #region Settings
 
