@@ -21,10 +21,12 @@
     <DebugType>portable</DebugType>
   </PropertyGroup>
 
-  <!-- Files for packing -->
+  <!-- References for packing -->
   <ItemGroup>
-    <None Include="..\LICENSE.txt" Pack="true" PackagePath=""/>
-    <None Include="..\README.md" Pack="true" PackagePath=""/>
+    <None Include="..\LICENSE.txt" Pack="true" PackagePath="" />
+    <None Include="..\README.md" Pack="true" PackagePath="" />
+    <ProjectReference Include="..\AppSettingsManagement.SourceGenerators\AppSettingsManagement.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <None Include="..\AppSettingsManagement.SourceGenerators\bin\Release\netstandard2.0\AppSettingsManagement.SourceGenerators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
 
 </Project>
