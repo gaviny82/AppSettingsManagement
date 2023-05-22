@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- Enable for building on Linux -->
+  <PropertyGroup>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\AppSettingsManagement\AppSettingsManagement.csproj"/>
   </ItemGroup>
