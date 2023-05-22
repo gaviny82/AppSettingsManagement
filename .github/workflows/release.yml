@@ -22,9 +22,15 @@ jobs:
         name: packages
         path: ./artifacts
 
+    # Replace refs/tags/ with empty string if a tag is pushed, otherwise use the latest tag
     - name: Get version number
       id: get_version
-      run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\//} # Replace refs/tags/ with empty string
+      run: |
+        if [[ "${{ github.event_name }}" == "push" ]]; then
+          echo ::set-output name=version::${GITHUB_REF/refs\/tags\//}
+        else
+          echo ::set-output name=version::$(git describe --tags `git rev-list --tags --max-count=1`)
+        fi
 
     - name: Create Release
       id: create_release
