@@ -24,27 +24,28 @@ jobs:
 
     # Checkout the code if run manually to allow tag to be obtained
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       if: ${{ github.event_name }} == 'push'
+      with:
+        fetch-depth: 0 # Required to get all git history
 
-    # Replace refs/tags/ with empty string if a tag is pushed, otherwise use the latest tag
-    - name: Get version number
-      id: get_version
+    # Replace refs/tags/ with empty string from github.ref if a tag is pushed, otherwise use the latest tag
+    - name: Get Tag
+      id: get_tag
       run: |
         if [[ "${{ github.event_name }}" == "push" ]]; then
-          echo ::set-output name=version::${GITHUB_REF/refs\/tags\//}
+          echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
         else
-          echo ::set-output name=version::$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
         fi
 
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
       with:
         files: ./artifacts/*
-        name: Release ${{ steps.get_version.outputs.version }}
-        tag_name: ${{ github.ref }}
+        name: Release ${{ steps.get_tag.outputs.tag }}
+        tag_name: ${{ steps.get_tag.outputs.tag }}
         generate_release_notes: true
         draft: true
         prerelease: true
