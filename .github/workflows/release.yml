@@ -4,7 +4,6 @@ on:
   push:
     tags:
         - '*'
-  workflow_dispatch:
 
 jobs:
   build:
@@ -22,23 +21,11 @@ jobs:
         name: packages
         path: ./artifacts
 
-    # Checkout the code if run manually to allow tag to be obtained
-    - name: Checkout code
-      uses: actions/checkout@v3
-      if: ${{ github.event_name }} == 'push'
-      with:
-        fetch-depth: 0 # Required to get all git history
-
     # Replace refs/tags/ with empty string from github.ref if a tag is pushed, otherwise use the latest tag
     - name: Get Tag
       id: get_tag
-      run: |
-        if [[ "${{ github.event_name }}" == "push" ]]; then
-          echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
-        else
-          echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
-        fi
-
+      run: echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+        
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
