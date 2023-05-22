@@ -1,0 +1,49 @@
+name: Build
+
+on: workflow_dispatch
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 7.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: |
+        dotnet build AppSettingsManagement --configuration Release --no-restore
+        dotnet build AppSettingsManagement.Windows --configuration Release --no-restore
+
+    # - name: Test
+    #   run: dotnet test --no-restore --verbosity normal
+
+    # Pack NuGet packages and store .nupkg files in the `out` folder
+    - name: Pack
+      run: |
+        dotnet pack AppSettingsManagement --configuration Release --no-build -o out
+        dotnet pack AppSettingsManagement.Windows --configuration Release --no-build -o out
+
+    # Upload .nupkg and .snupkg files as artifacts
+    - name: Upload to artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: packages
+        path: out/*
+
+    # - name: Push
+    #   uses: nuget/setup-nuget@v1
+    #   with:
+    #     nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+
+    # - name: Publish
+    #   run: nuget push out/*.nupkg -Source https://api.nuget.org/v3/index.json
