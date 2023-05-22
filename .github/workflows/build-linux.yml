@@ -1,4 +1,4 @@
-name: Build
+name: Build Linux
 
 on: workflow_dispatch
 
@@ -17,7 +17,9 @@ jobs:
         dotnet-version: 7.0.x
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: |
+        dotnet restore AppSettingsManagement
+        dotnet restore AppSettingsManagement.Windows
 
     - name: Build
       run: |
