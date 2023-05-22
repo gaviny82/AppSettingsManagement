@@ -26,14 +26,14 @@ jobs:
         name: packages
         path: ./artifacts
 
-    - name: Create Release
+    - name: Create Release 2
       id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-        release_name: Release ${{ github.ref }}
+        files: ./artifacts/*
+        name: Release ${{ github.ref }}
         tag_name: ${{ github.ref }}
         body: Body
-        draft: false
+        draft: true
         prerelease: true
