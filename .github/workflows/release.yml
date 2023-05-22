@@ -22,6 +22,11 @@ jobs:
         name: packages
         path: ./artifacts
 
+    # Checkout the code if run manually to allow tag to be obtained
+    - name: Checkout code
+      uses: actions/checkout@v2
+      if: ${{ github.event_name }} == 'push'
+
     # Replace refs/tags/ with empty string if a tag is pushed, otherwise use the latest tag
     - name: Get version number
       id: get_version
