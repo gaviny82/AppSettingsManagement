@@ -15,10 +15,6 @@ jobs:
     needs: build
 
     steps:
-    # - name: Setup .NET
-    #   uses: actions/setup-dotnet@v1
-    #   with:
-    #     dotnet-version: 7.0.x
 
     - name: Download Artifact
       uses: actions/download-artifact@v2
@@ -26,14 +22,18 @@ jobs:
         name: packages
         path: ./artifacts
 
-    - name: Create Release 2
+    - name: Get version number
+      id: get_version
+      run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\//} # Replace refs/tags/ with empty string
+
+    - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: ./artifacts/*
-        name: Release ${{ github.ref }}
+        name: Release ${{ steps.get_version.outputs.version }}
         tag_name: ${{ github.ref }}
-        body: Body
+        generate_release_notes: true
         draft: true
         prerelease: true
