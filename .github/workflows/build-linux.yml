@@ -1,10 +1,10 @@
-name: Build Linux
+name: Build Ubuntu
 
-on: workflow_dispatch
+on: [workflow_dispatch, workflow_call]
 
 jobs:
-  build:
 
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +40,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: packages
-        path: out/*
+        path: out/
 
     # - name: Push
     #   uses: nuget/setup-nuget@v1
