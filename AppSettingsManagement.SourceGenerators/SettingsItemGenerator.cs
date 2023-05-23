@@ -9,71 +9,71 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
+namespace AppSettingsManagement.Generators;
 
-namespace AppSettingsManagement.Generators
+
+[Generator(LanguageNames.CSharp)]
+public class SettingsItemSourceGenerator : ISourceGenerator
 {
+    Compilation _compilation;
 
-    [Generator(LanguageNames.CSharp)]
-    public class SettingsItemSourceGenerator : ISourceGenerator
+    public SettingsItemSourceGenerator()
     {
-        Compilation _compilation;
-
-        public SettingsItemSourceGenerator()
-        {
 #if DEBUG
-            if (!Debugger.IsAttached)
-            {
-                //Debugger.Launch();
-            }
+        if (!Debugger.IsAttached)
+        {
+            //Debugger.Launch();
+        }
 #endif
-        }
-        public void Initialize(GeneratorInitializationContext context)
+    }
+
+    public void Initialize(GeneratorInitializationContext context)
+    {
+        context.RegisterForSyntaxNotifications(() => new SettingsContainerSyntaxReceiver());
+    }
+
+    string GetFullNameFromTypeOfExpression(TypeOfExpressionSyntax typeofExpression)
+    {
+        var semanticModel = _compilation.GetSemanticModel(typeofExpression.SyntaxTree);
+        var typeInfo = semanticModel.GetTypeInfo(typeofExpression.Type);
+        return $"typeof(global::{typeInfo.Type.ToDisplayString()})";
+    }
+
+    void GenerateSettingItem(AttributeSyntax attributeSyntax, StringBuilder memberBuilder)
+    {
+        var arguments = attributeSyntax.ArgumentList.Arguments;
+        if (arguments.Count < 2) return;
+
+        // Parse property type
+        string propertyType = arguments[0].Expression.ToString();
+        propertyType = propertyType.Substring("typeof(".Length, propertyType.Length - 1 - "typeof(".Length); // Remove typeof()
+
+        // Parse property name
+        string propertyName = arguments[1].Expression.ToString().Trim('"');
+
+        string defaultValue = "";
+        string converter = "";
+
+        // Parse default value and converter
+        for (int i = 2; i < arguments.Count; i++)
         {
-            context.RegisterForSyntaxNotifications(() => new SettingsContainerSyntaxReceiver());
-        }
-
-        string GetFullNameFromTypeOfExpression(TypeOfExpressionSyntax typeofExpression)
-        {
-            var semanticModel = _compilation.GetSemanticModel(typeofExpression.SyntaxTree);
-            var typeInfo = semanticModel.GetTypeInfo(typeofExpression.Type);
-            return $"typeof(global::{typeInfo.Type.ToDisplayString()})";
-        }
-
-        void GenerateSettingItem(AttributeSyntax attributeSyntax, StringBuilder memberBuilder)
-        {
-            var arguments = attributeSyntax.ArgumentList.Arguments;
-            if (arguments.Count < 2) return;
-
-            // Parse property type
-            string propertyType = arguments[0].Expression.ToString();
-            propertyType = propertyType.Substring("typeof(".Length, propertyType.Length - 1 - "typeof(".Length); // Remove typeof()
-
-            // Parse property name
-            string propertyName = arguments[1].Expression.ToString().Trim('"');
-
-            string defaultValue = "";
-            string converter = "";
-
-            // Parse default value and converter
-            for (int i = 2; i < arguments.Count; i++)
+            if (arguments[i].NameEquals?.Name.ToString() == "Default")
             {
-                if (arguments[i].NameEquals?.Name.ToString() == "Default")
-                {
-                    defaultValue = $", {arguments[i].Expression.ToString().Trim()}";
-                }
-                else if (arguments[i].NameEquals?.Name.ToString() == "Converter")
-                {
-                    var converterTypeofExpression = arguments[i].Expression as TypeOfExpressionSyntax;
-                    string converterName = GetFullNameFromTypeOfExpression(converterTypeofExpression);
-                    converter = $", global::AppSettingsManagement.Converters.DataTypeConverters.GetConverter({converterName})";
-                }
+                defaultValue = $", {arguments[i].Expression.ToString().Trim()}";
             }
+            else if (arguments[i].NameEquals?.Name.ToString() == "Converter")
+            {
+                var converterTypeofExpression = arguments[i].Expression as TypeOfExpressionSyntax;
+                string converterName = GetFullNameFromTypeOfExpression(converterTypeofExpression);
+                converter = $", global::AppSettingsManagement.Converters.DataTypeConverters.GetConverter({converterName})";
+            }
+        }
 
-            // If default value is not provided, the property is nullable
-            string nullable = string.IsNullOrEmpty(defaultValue) ? "?" : "";
+        // If default value is not provided, the property is nullable
+        string nullable = string.IsNullOrEmpty(defaultValue) ? "?" : "";
 
-            memberBuilder.Append($$"""
-                        public {{propertyType}}{{nullable}} {{propertyName}}
+        memberBuilder.Append($$"""
+                    public {{propertyType}}{{nullable}} {{propertyName}}
                         {
                             get => GetValue<{{propertyType}}{{nullable}}>(nameof({{propertyName}}){{defaultValue}}{{converter}});
                             set => SetValue<{{propertyType}}>(nameof({{propertyName}}), value, {{propertyName}}Changed{{converter}});
@@ -83,96 +83,96 @@ namespace AppSettingsManagement.Generators
 
 
                 """);
+    }
+
+    void GenerateSettingsContainer(AttributeSyntax attributeSyntax, StringBuilder membersBuilder, StringBuilder initBuilder)
+    {
+        var arguments = attributeSyntax.ArgumentList.Arguments;
+        if (arguments.Count < 2) return;
+
+        // Parse property type
+        string propertyType = arguments[0].Expression.ToString();
+        propertyType = propertyType.Substring("typeof(".Length, propertyType.Length - 1 - "typeof(".Length); // Remove typeof()
+
+        // Parse property name
+        string propertyName = arguments[1].Expression.ToString().Trim('"');
+
+        // Generate code
+        membersBuilder.Append($$"""
+                    public {{propertyType}} {{propertyName}} { get; private set; } = null!;
+
+                """);
+
+        initBuilder.Append($$"""
+                        {{propertyName}} = new {{propertyType}}(Storage, "{{propertyName}}", this);
+
+                """);
+    }
+
+    void GenerateSettingsCollection(AttributeSyntax attributeSyntax, StringBuilder membersBuilder, StringBuilder initBuilder)
+    {
+        var arguments = attributeSyntax.ArgumentList.Arguments;
+        if (arguments.Count < 2) return;
+
+        // Parse property type
+        string elementType = arguments[0].Expression.ToString();
+        elementType = elementType.Substring("typeof(".Length, elementType.Length - 1 - "typeof(".Length); // Remove typeof()
+
+        // Parse property name
+        string propertyName = arguments[1].Expression.ToString().Trim('"');
+
+        // Parse converter
+        string converter = "";
+        if (arguments.Count > 2)
+        {
+            var converterTypeofExpression = arguments[2].Expression as TypeOfExpressionSyntax;
+            string converterName = GetFullNameFromTypeOfExpression(converterTypeofExpression);
+            converter = $", global::AppSettingsManagement.Converters.DataTypeConverters.GetConverter({converterName})";
         }
 
-        void GenerateSettingsContainer(AttributeSyntax attributeSyntax, StringBuilder membersBuilder, StringBuilder initBuilder)
-        {
-            var arguments = attributeSyntax.ArgumentList.Arguments;
-            if (arguments.Count < 2) return;
-
-            // Parse property type
-            string propertyType = arguments[0].Expression.ToString();
-            propertyType = propertyType.Substring("typeof(".Length, propertyType.Length - 1 - "typeof(".Length); // Remove typeof()
-
-            // Parse property name
-            string propertyName = arguments[1].Expression.ToString().Trim('"');
-
-            // Generate code
-            membersBuilder.Append($$"""
-                        public {{propertyType}} {{propertyName}} { get; private set; } = null!;
+        // Generate code
+        membersBuilder.Append($$"""
+                    public global::AppSettingsManagement.SettingsCollection<{{elementType}}> {{propertyName}} { get; private set; } = null!;
 
                 """);
 
-            initBuilder.Append($$"""
-                            {{propertyName}} = new {{propertyType}}(Storage, "{{propertyName}}", this);
+        initBuilder.Append($$"""
+                        {{propertyName}} = new global::AppSettingsManagement.SettingsCollection<{{elementType}}>(Storage, "{{propertyName}}"{{converter}});
 
                 """);
-        }
+    }
 
-        void GenerateSettingsCollection(AttributeSyntax attributeSyntax, StringBuilder membersBuilder, StringBuilder initBuilder)
+    public void Execute(GeneratorExecutionContext context)
+    {
+        var syntaxReceiver = (SettingsContainerSyntaxReceiver)context.SyntaxReceiver;
+        _compilation = context.Compilation;
+        
+        foreach (var (classDeclaration, constructorAttributes) in syntaxReceiver.SettingsContainerConstructorAttributes)
         {
-            var arguments = attributeSyntax.ArgumentList.Arguments;
-            if (arguments.Count < 2) return;
+            INamedTypeSymbol classSymbol = (INamedTypeSymbol)_compilation
+                .GetSemanticModel(classDeclaration.SyntaxTree)
+                .GetDeclaredSymbol(classDeclaration);
 
-            // Parse property type
-            string elementType = arguments[0].Expression.ToString();
-            elementType = elementType.Substring("typeof(".Length, elementType.Length - 1 - "typeof(".Length); // Remove typeof()
+            string className = classSymbol.Name;
+            string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
 
-            // Parse property name
-            string propertyName = arguments[1].Expression.ToString().Trim('"');
-
-            // Parse converter
-            string converter = "";
-            if (arguments.Count > 2)
+            var membersBuilder = new StringBuilder();
+            var initBuilder = new StringBuilder();
+            foreach (var attributeInfo in constructorAttributes)
             {
-                var converterTypeofExpression = arguments[2].Expression as TypeOfExpressionSyntax;
-                string converterName = GetFullNameFromTypeOfExpression(converterTypeofExpression);
-                converter = $", global::AppSettingsManagement.Converters.DataTypeConverters.GetConverter({converterName})";
+                string attributeName = attributeInfo.Name.ToString();
+                if (attributeName.EndsWith("Attribute"))
+                    attributeName = attributeName.Substring(0, attributeName.Length - "Attribute".Length);
+
+                if (attributeName == "SettingItem")
+                    GenerateSettingItem(attributeInfo, membersBuilder);
+                else if (attributeName == "SettingsContainer")
+                    GenerateSettingsContainer(attributeInfo, membersBuilder, initBuilder);
+                else if (attributeName == "SettingsCollection")
+                    GenerateSettingsCollection(attributeInfo, membersBuilder, initBuilder);
             }
 
-            // Generate code
-            membersBuilder.Append($$"""
-                        public global::AppSettingsManagement.SettingsCollection<{{elementType}}> {{propertyName}} { get; private set; } = null!;
-
-                """);
-
-            initBuilder.Append($$"""
-                            {{propertyName}} = new global::AppSettingsManagement.SettingsCollection<{{elementType}}>(Storage, "{{propertyName}}"{{converter}});
-
-                """);
-        }
-
-        public void Execute(GeneratorExecutionContext context)
-        {
-            var syntaxReceiver = (SettingsContainerSyntaxReceiver)context.SyntaxReceiver;
-            _compilation = context.Compilation;
-            
-            foreach (var (classDeclaration, constructorAttributes) in syntaxReceiver.SettingsContainerConstructorAttributes)
-            {
-                INamedTypeSymbol classSymbol = (INamedTypeSymbol)_compilation
-                    .GetSemanticModel(classDeclaration.SyntaxTree)
-                    .GetDeclaredSymbol(classDeclaration);
-
-                string className = classSymbol.Name;
-                string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
-
-                var membersBuilder = new StringBuilder();
-                var initBuilder = new StringBuilder();
-                foreach (var attributeInfo in constructorAttributes)
-                {
-                    string attributeName = attributeInfo.Name.ToString();
-                    if (attributeName.EndsWith("Attribute"))
-                        attributeName = attributeName.Substring(0, attributeName.Length - "Attribute".Length);
-
-                    if (attributeName == "SettingItem")
-                        GenerateSettingItem(attributeInfo, membersBuilder);
-                    else if (attributeName == "SettingsContainer")
-                        GenerateSettingsContainer(attributeInfo, membersBuilder, initBuilder);
-                    else if (attributeName == "SettingsCollection")
-                        GenerateSettingsCollection(attributeInfo, membersBuilder, initBuilder);
-                }
-
-                var source = $$"""
+            var source = $$"""
                     // <auto-generated/>
                     #pragma warning disable
                     #nullable enable
@@ -191,53 +191,51 @@ namespace AppSettingsManagement.Generators
                     }
                     """;
 
-                context.AddSource($"{className}_SettingsContainerMembersGenerated", SourceText.From(source, Encoding.UTF8));
-            }
+            context.AddSource($"{className}_SettingsContainerMembersGenerated", SourceText.From(source, Encoding.UTF8));
         }
     }
+}
 
-    internal class SettingsContainerSyntaxReceiver : ISyntaxReceiver
+internal class SettingsContainerSyntaxReceiver : ISyntaxReceiver
+{
+    public List<(ClassDeclarationSyntax Node, List<AttributeSyntax> Attributes)> SettingsContainerConstructorAttributes { get; } = new List<(ClassDeclarationSyntax Node, List<AttributeSyntax> Attributes)>();
+
+    private readonly string[] settingAttributes = new string[] 
     {
-        public List<(ClassDeclarationSyntax Node, List<AttributeSyntax> Attributes)> SettingsContainerConstructorAttributes { get; } = new List<(ClassDeclarationSyntax Node, List<AttributeSyntax> Attributes)>();
+        "SettingItem", "SettingItemAttribute",
+        "SettingsContainer", "SettingsContainerAttribute",
+        "SettingsCollection", "SettingsCollectionAttribute"
+    };
 
-        private readonly string[] settingAttributes = new string[] 
+    public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+    {
+        if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax)
         {
-            "SettingItem", "SettingItemAttribute",
-            "SettingsContainer", "SettingsContainerAttribute",
-            "SettingsCollection", "SettingsCollectionAttribute"
-        };
+            // Check if the class inherits SettingsContainer
+            bool isSettingsContainer = 
+                classDeclarationSyntax?.BaseList?.Types
+                .Where(type => (type.Type as IdentifierNameSyntax)?
+                    .Identifier
+                    .Text == "SettingsContainer")
+                .Any() ?? false;
 
-        public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
-        {
-            if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax)
+            if (!isSettingsContainer) return;
+
+            // Find attributes of the constructor
+            var constructors = classDeclarationSyntax.DescendantNodes().OfType<ConstructorDeclarationSyntax>();
+
+            foreach (ConstructorDeclarationSyntax constructor in constructors)
             {
-                // Check if the class inherits SettingsContainer
-                bool isSettingsContainer = 
-                    classDeclarationSyntax?.BaseList?.Types
-                    .Where(type => (type.Type as IdentifierNameSyntax)?
-                        .Identifier
-                        .Text == "SettingsContainer")
-                    .Any() ?? false;
+                List<AttributeSyntax> attributes = constructor.AttributeLists
+                    .SelectMany(attributeList => attributeList.Attributes)                      // Flatten the list of constructor attributes
+                    .Where(attribute => settingAttributes.Contains(attribute.Name.ToString()))  // Filter supported attributes
+                    .ToList();
 
-                if (!isSettingsContainer) return;
-
-                // Find attributes of the constructor
-                var constructors = classDeclarationSyntax.DescendantNodes().OfType<ConstructorDeclarationSyntax>();
-
-                foreach (ConstructorDeclarationSyntax constructor in constructors)
+                if (attributes.Count != 0)
                 {
-                    List<AttributeSyntax> attributes = constructor.AttributeLists
-                        .SelectMany(attributeList => attributeList.Attributes)                      // Flatten the list of constructor attributes
-                        .Where(attribute => settingAttributes.Contains(attribute.Name.ToString()))  // Filter supported attributes
-                        .ToList();
-
-                    if (attributes.Count != 0)
-                    {
-                        SettingsContainerConstructorAttributes.Add((classDeclarationSyntax, attributes));
-                    }
+                    SettingsContainerConstructorAttributes.Add((classDeclarationSyntax, attributes));
                 }
             }
         }
     }
-
 }
