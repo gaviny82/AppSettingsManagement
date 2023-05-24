@@ -64,7 +64,7 @@ public class SettingsViewModelGenerator : ISourceGenerator
                     partial class {{model.ClassName}}
                     {
                         [GeneratedCode("AppSettingsManagement", "alpha")]
-                        global::AppSettingsManagement.SettingsContainer SettingsContainer => {{model.SettingsProviderMemberName}};
+                        global::AppSettingsManagement.SettingsContainer ISettingsViewModel.SettingsContainer => {{model.SettingsProviderMemberName}};
 
                         [GeneratedCode("AppSettingsManagement", "alpha")]
                         global::System.Collections.Generic.Dictionary<string, SettingChangedEventHandler> ISettingsViewModel.SettingChangedEventHandlers { get; } = new();
@@ -100,6 +100,7 @@ public class SettingsViewModelGenerator : ISourceGenerator
                         {
                             SettingsService container = {{model.SettingsProviderMemberName}};
                             global::System.Collections.Generic.Dictionary<string, SettingChangedEventHandler> handlers = ((ISettingsViewModel)this).SettingChangedEventHandlers;
+
                 {{finalizerBuilder.ToString()}}
                         }
                     }
@@ -135,7 +136,7 @@ public class SettingsViewModelGenerator : ISourceGenerator
             """);
 
         finalizerBuilder.Append($$"""
-                        container.{{member.Path.Replace('/', '.')}}Changed -= handlers[{{member.Path}}];
+                        container.{{member.Path.Replace('/', '.')}}Changed -= handlers["{{member.Path}}"];
 
             """);
     }
@@ -177,9 +178,9 @@ public class SettingsViewModelInformation
 
     public SettingsViewModelInformation(ClassDeclarationSyntax classDeclaration, GeneratorExecutionContext context)
     {
-        var sementicModel = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
+        var semanticModel = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
         
-        var classSymbol = sementicModel.GetDeclaredSymbol(classDeclaration);
+        var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
         Namespace = classSymbol.ContainingNamespace.ToDisplayString();
         ClassName = classDeclaration.Identifier.ValueText;
 
@@ -195,7 +196,7 @@ public class SettingsViewModelInformation
             return;
 
         // Get settings provider namespace and type name
-        var settingsProviderFieldSymbol = sementicModel.GetDeclaredSymbol(settingsProviderDeclSyntax.Declaration.Variables.First()) as IFieldSymbol;
+        var settingsProviderFieldSymbol = semanticModel.GetDeclaredSymbol(settingsProviderDeclSyntax.Declaration.Variables.First()) as IFieldSymbol;
         SettingsProviderMemberName = settingsProviderFieldSymbol.Name;
         SettingsProviderClassFullName = $"global::{settingsProviderFieldSymbol.Type.ContainingNamespace}.{settingsProviderFieldSymbol.Type.Name}";
 
@@ -232,13 +233,9 @@ public class SettingsViewModelInformation
             if (pathArgument is null)
                 continue;
 
-            var path = pathArgument.Expression switch
-            {
-                LiteralExpressionSyntax literalExpression => literalExpression.Token.ValueText,
-                IdentifierNameSyntax identifierName => identifierName.Identifier.ValueText,
-                InvocationExpressionSyntax invocationExpression => invocationExpression.ToString(),
-                _ => pathArgument.Expression.ToString()
-            };
+            // Get path by evaluating the argument const expression
+            Optional<object> pathExpressionValue = semanticModel.GetConstantValue(pathArgument.Expression);
+            var path = pathExpressionValue.HasValue ? (string)pathExpressionValue.Value : "";
 
             // Add to list
             if (!type.StartsWith("ObservableCollection"))
