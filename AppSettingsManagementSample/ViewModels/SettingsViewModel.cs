@@ -53,7 +53,6 @@ internal partial class SettingsViewModel : ObservableObject, ISettingsViewModel
     void AddItem()
     {
         TestList.Add(TestList.Count);
-        //Console.WriteLine();
     }
 
     [RelayCommand]
