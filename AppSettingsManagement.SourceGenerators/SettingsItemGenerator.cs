@@ -191,7 +191,7 @@ public class SettingsItemSourceGenerator : ISourceGenerator
                     }
                     """;
 
-            context.AddSource($"{className}_SettingsContainerMembersGenerated", SourceText.From(source, Encoding.UTF8));
+            context.AddSource($"{namespaceName}.{className}.g.cs", SourceText.From(source, Encoding.UTF8));
         }
     }
 }

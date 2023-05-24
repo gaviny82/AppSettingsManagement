@@ -107,7 +107,7 @@ public class SettingsViewModelGenerator : ISourceGenerator
                 }
                 """;
 
-            context.AddSource($"{model.ClassName}_Generated.cs", source);
+            context.AddSource($"{model.Namespace}.{model.ClassName}.g.cs", source);
         }
     }
 
