@@ -37,8 +37,25 @@ public class SettingsItemSourceGenerator : ISourceGenerator
     {
         var semanticModel = _compilation.GetSemanticModel(typeofExpression.SyntaxTree);
         var typeInfo = semanticModel.GetTypeInfo(typeofExpression.Type);
-        return $"typeof(global::{typeInfo.Type.ToDisplayString()})";
+
+        return GetFullNameFromTypeSymbol(typeInfo.Type);
     }
+
+    string GetFullNameFromTypeSymbol(ITypeSymbol typeSymbol)
+    {
+        string @namespace = typeSymbol.ContainingNamespace.ToDisplayString();
+        string typeName = typeSymbol.Name;
+
+        string genericArgs = "";
+        if (typeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsGenericType)
+        {
+            var typeArgs = namedTypeSymbol.TypeArguments.Select(typeArg => GetFullNameFromTypeSymbol(typeArg));
+            genericArgs = $"<{string.Join(", ", typeArgs)}>";
+        }
+
+        return $"global::{@namespace}.{typeName}{genericArgs}";
+    }
+
 
     void GenerateSettingItem(AttributeSyntax attributeSyntax, StringBuilder memberBuilder)
     {
@@ -49,9 +66,7 @@ public class SettingsItemSourceGenerator : ISourceGenerator
 
         // Parse property type
         var propertyTypeOfExpression = arguments[0].Expression as TypeOfExpressionSyntax;
-        TypeInfo propertyTypeInfo = semanticModel.GetTypeInfo(propertyTypeOfExpression.Type);
-        ITypeSymbol propertyTypeSymbol = propertyTypeInfo.Type;
-        var propertyType = $"global::{propertyTypeSymbol.ContainingNamespace.ToDisplayString()}.{propertyTypeSymbol.Name}";
+        var propertyType = GetFullNameFromTypeOfExpression(propertyTypeOfExpression);
 
         // Parse property name
         string propertyName = arguments[1].Expression.ToString().Trim('"');
@@ -70,7 +85,7 @@ public class SettingsItemSourceGenerator : ISourceGenerator
             {
                 var converterTypeofExpression = arguments[i].Expression as TypeOfExpressionSyntax;
                 string converterName = GetFullNameFromTypeOfExpression(converterTypeofExpression);
-                converter = $", global::AppSettingsManagement.Converters.DataTypeConverters.GetConverter({converterName})";
+                converter = $", global::AppSettingsManagement.Converters.DataTypeConverters.GetConverter(typeof({converterName}))";
             }
         }
 
@@ -132,7 +147,7 @@ public class SettingsItemSourceGenerator : ISourceGenerator
         {
             var converterTypeofExpression = arguments[2].Expression as TypeOfExpressionSyntax;
             string converterName = GetFullNameFromTypeOfExpression(converterTypeofExpression);
-            converter = $", global::AppSettingsManagement.Converters.DataTypeConverters.GetConverter({converterName})";
+            converter = $", global::AppSettingsManagement.Converters.DataTypeConverters.GetConverter(typeof({converterName}))";
         }
 
         // Generate code
