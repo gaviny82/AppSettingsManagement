@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -41,12 +42,16 @@ public class SettingsItemSourceGenerator : ISourceGenerator
 
     void GenerateSettingItem(AttributeSyntax attributeSyntax, StringBuilder memberBuilder)
     {
+        var semanticModel = _compilation.GetSemanticModel(attributeSyntax.SyntaxTree);
+
         var arguments = attributeSyntax.ArgumentList.Arguments;
         if (arguments.Count < 2) return;
 
         // Parse property type
-        string propertyType = arguments[0].Expression.ToString();
-        propertyType = propertyType.Substring("typeof(".Length, propertyType.Length - 1 - "typeof(".Length); // Remove typeof()
+        var propertyTypeOfExpression = arguments[0].Expression as TypeOfExpressionSyntax;
+        TypeInfo propertyTypeInfo = semanticModel.GetTypeInfo(propertyTypeOfExpression.Type);
+        ITypeSymbol propertyTypeSymbol = propertyTypeInfo.Type;
+        var propertyType = $"global::{propertyTypeSymbol.ContainingNamespace.ToDisplayString()}.{propertyTypeSymbol.Name}";
 
         // Parse property name
         string propertyName = arguments[1].Expression.ToString().Trim('"');
