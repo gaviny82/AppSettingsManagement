@@ -135,8 +135,7 @@ public class SettingsItemSourceGenerator : ISourceGenerator
         if (arguments.Count < 2) return;
 
         // Parse property type
-        string elementType = arguments[0].Expression.ToString();
-        elementType = elementType.Substring("typeof(".Length, elementType.Length - 1 - "typeof(".Length); // Remove typeof()
+        string elementType = GetFullNameFromTypeOfExpression(arguments[0].Expression as TypeOfExpressionSyntax);
 
         // Parse property name
         string propertyName = arguments[1].Expression.ToString().Trim('"');
@@ -157,7 +156,7 @@ public class SettingsItemSourceGenerator : ISourceGenerator
                 """);
 
         initBuilder.Append($$"""
-                        {{propertyName}} = new global::AppSettingsManagement.SettingsCollection<{{elementType}}>(Storage, "{{propertyName}}"{{converter}});
+                            {{propertyName}} = new global::AppSettingsManagement.SettingsCollection<{{elementType}}>(Storage, "{{propertyName}}"{{converter}});
 
                 """);
     }
