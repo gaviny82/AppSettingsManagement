@@ -73,7 +73,7 @@ public class SettingsItemSourceGenerator : ISourceGenerator
         string nullable = string.IsNullOrEmpty(defaultValue) ? "?" : "";
 
         memberBuilder.Append($$"""
-                    public {{propertyType}}{{nullable}} {{propertyName}}
+                        public {{propertyType}}{{nullable}} {{propertyName}}
                         {
                             get => GetValue<{{propertyType}}{{nullable}}>(nameof({{propertyName}}){{defaultValue}}{{converter}});
                             set => SetValue<{{propertyType}}>(nameof({{propertyName}}), value, {{propertyName}}Changed{{converter}});
