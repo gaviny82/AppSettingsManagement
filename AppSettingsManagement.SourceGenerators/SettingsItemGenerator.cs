@@ -104,7 +104,7 @@ public class SettingsItemSourceGenerator : ISourceGenerator
 
         // Generate code
         membersBuilder.Append($$"""
-                    public {{propertyType}} {{propertyName}} { get; private set; } = null!;
+                        public {{propertyType}} {{propertyName}} { get; private set; } = null!;
 
                 """);
 
@@ -137,7 +137,7 @@ public class SettingsItemSourceGenerator : ISourceGenerator
 
         // Generate code
         membersBuilder.Append($$"""
-                    public global::AppSettingsManagement.SettingsCollection<{{elementType}}> {{propertyName}} { get; private set; } = null!;
+                        public global::AppSettingsManagement.SettingsCollection<{{elementType}}> {{propertyName}} { get; private set; } = null!;
 
                 """);
 
