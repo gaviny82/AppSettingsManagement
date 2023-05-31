@@ -11,10 +11,6 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AppSettingsManagement\AppSettingsManagement.csproj"/>
-  </ItemGroup>
-
   <!-- NuGet -->
   <PropertyGroup>
     <PackageId>AppSettingsManagement.Windows</PackageId>
@@ -29,10 +25,23 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <DebugType>portable</DebugType>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources> <!-- Needed for source link -->
   </PropertyGroup>
 
-  <!-- Files for packing -->
+  <!-- Source Link -->
+  <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <!-- References for packing -->
+  <ItemGroup>
+    <ProjectReference Include="..\AppSettingsManagement\AppSettingsManagement.csproj"/>
     <None Include="..\LICENSE.txt" Pack="true" PackagePath=""/>
     <None Include="..\README.md" Pack="true" PackagePath=""/>
   </ItemGroup>
