@@ -19,10 +19,13 @@ namespace AppSettingsManagementSample.ViewModels;
 
 // Enhancement: build a separate WeakEventManager? use reflection?
 
-internal partial class SettingsViewModel : ObservableObject, ISettingsViewModel
+internal partial class SettingsViewModel : SettingsViewModelBase, ISettingsViewModel
 {
     [SettingsProvider]
-    private readonly SettingsService _settingsService;
+    protected readonly SettingsService _settingsService;
+
+    // TODO: Source Generator: also searches [SettingsProvider] in the parent classes to allow initialisation to be placed into a common base class
+    // This will allow more simplification in SettingsViewModel when using AppSettingsManagement package.
 
     public SettingsViewModel(SettingsService settingsService)
     {
@@ -30,10 +33,6 @@ internal partial class SettingsViewModel : ObservableObject, ISettingsViewModel
         ((ISettingsViewModel)this).InitializeSettings();
     }
 
-    ~SettingsViewModel()
-    {
-        ((ISettingsViewModel)this).RemoveSettingsChagnedHandlers();
-    }
 
     // Test: Bind to a single value
     [ObservableProperty]
