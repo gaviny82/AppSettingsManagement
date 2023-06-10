@@ -14,7 +14,7 @@
   <!-- NuGet -->
   <PropertyGroup>
     <PackageId>AppSettingsManagement.Windows</PackageId>
-    <Version>0.2.5-alpha</Version>
+    <Version>0.2.6-alpha</Version>
     <Authors>GavinY</Authors>
     <Description>A library for managing app settings and MVVM bindings with WinRT ApplicationDataContainer support</Description>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
